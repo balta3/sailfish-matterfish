@@ -6,6 +6,7 @@
 #include <QQmlListProperty>
 
 #include "mattermostchannel.h"
+#include "mattermostteammember.h"
 
 class MattermostTeam : public QObject
 {
@@ -27,6 +28,10 @@ public:
     void clearChannels();
     QQmlListProperty<MattermostChannel> getChannelsQML();
 
+    void clearMembers();
+    void addMember(MattermostTeamMember* member);
+    Q_INVOKABLE MattermostTeamMember* getMemberByDirectMessageChannelId(QString channelId);
+
 signals:
     void idChanged(const QString &value);
     void displayNameChanged(const QString &value);
@@ -38,6 +43,7 @@ private:
     QString id;
     QString displayName;
     QList<MattermostChannel*> channels;
+    QList<MattermostTeamMember*> members;
 };
 
 #endif // MATTERMOSTTEAM_H

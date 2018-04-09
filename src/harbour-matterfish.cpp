@@ -10,6 +10,9 @@ static QObject* clientGen(QQmlEngine *engine, QJSEngine *scriptEngine) {
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
     MattermostClient* client = new MattermostClient();
+    client->setHost("chat.wissenswerft.net");
+    client->setUsername("marcel.witte@wissenswerft.net");
+    client->setPassword("dXOImedw");
     return client;
 }
 
@@ -27,5 +30,6 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonType<MattermostClient>("harbour.matterfish", 1, 0, "MattermostClient", clientGen);
     qmlRegisterUncreatableType<MattermostTeam>("harbour.matterfish", 1, 0, "MattermostTeam", "");
     qmlRegisterUncreatableType<MattermostChannel>("harbour.matterfish", 1, 0, "MattermostChannel", "");
+    qmlRegisterUncreatableType<MattermostTeamMember>("harbour.matterfish", 1, 0, "MattermostTeamMember", "");
     return SailfishApp::main(argc, argv);
 }

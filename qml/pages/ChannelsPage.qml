@@ -34,9 +34,16 @@ Page {
             //height: Theme.itemSizeSmall
             //height: childrenRect.height + Theme.paddingMedium
             Label {
-                id: teamLabel
+                id: channelLabel
                 text: model.type + " - " + model.displayName
                 anchors.leftMargin: Theme.paddingMedium
+                visible: model.type !== "D"
+            }
+            Label {
+                id: dmLabel
+                text: MattermostClient.selectedTeam.getMemberByDirectMessageChannelId(model.id).userId
+                anchors.leftMargin: Theme.paddingMedium
+                visible: model.type === "D"
             }
         }
     }

@@ -18,7 +18,8 @@ CONFIG += c++11
 SOURCES += src/harbour-matterfish.cpp \
     src/mattermostclient.cpp \
     src/mattermostteam.cpp \
-    src/mattermostchannel.cpp
+    src/mattermostchannel.cpp \
+    src/mattermostteammember.cpp
 
 DISTFILES += qml/harbour-matterfish.qml \
     qml/cover/CoverPage.qml \
@@ -48,4 +49,5 @@ TRANSLATIONS += translations/harbour-matterfish-de.ts
 HEADERS += \
     src/mattermostclient.h \
     src/mattermostteam.h \
-    src/mattermostchannel.h
+    src/mattermostchannel.h \
+    src/mattermostteammember.h

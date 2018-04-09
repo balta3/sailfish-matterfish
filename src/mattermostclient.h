@@ -44,6 +44,7 @@ public slots:
     void connectToHost();
     void refreshTeams();
     void refreshChannels(MattermostTeam* team);
+    void refreshTeamMembers(MattermostTeam* team);
     void onResponse(QNetworkReply* reply);
 
 private:

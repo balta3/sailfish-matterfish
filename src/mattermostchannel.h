@@ -8,6 +8,7 @@ class MattermostChannel : public QObject
     Q_OBJECT
     Q_PROPERTY(QString id READ getId WRITE setId NOTIFY idChanged)
     Q_PROPERTY(QString type READ getType WRITE setType NOTIFY typeChanged)
+    Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString displayName READ getDisplayName WRITE setDisplayName NOTIFY displayNameChanged)
 public:
     explicit MattermostChannel(QObject *parent = nullptr);
@@ -18,12 +19,16 @@ public:
     QString getType() const;
     void setType(const QString &value);
 
+    QString getName() const;
+    void setName(const QString &value);
+
     QString getDisplayName() const;
     void setDisplayName(const QString &value);
 
 signals:
     void idChanged(const QString &value);
     void typeChanged(const QString &value);
+    void nameChanged(const QString &value);
     void displayNameChanged(const QString &value);
 
 public slots:
@@ -31,6 +36,7 @@ public slots:
 private:
     QString id;
     QString type;
+    QString name;
     QString displayName;
 };
 

@@ -42,6 +42,24 @@ void MattermostTeam::clearChannels()
     emit this->channelsChanged();
 }
 
+void MattermostTeam::clearMembers()
+{
+    this->members.clear();
+    emit this->channelsChanged();
+}
+
+void MattermostTeam::addMember(MattermostTeamMember *member)
+{
+    this->members.append(member);
+    emit this->channelsChanged();
+}
+
+MattermostTeamMember *MattermostTeam::getMemberByDirectMessageChannelId(QString channelId)
+{
+    MattermostTeamMember* member = *std::find_if(this->members.begin(), this->members.end(), [channelId] (MattermostTeamMember* m) {return m->getChannelId() == channelId; });
+    return member;
+}
+
 QQmlListProperty<MattermostChannel> MattermostTeam::getChannelsQML() {
     return QQmlListProperty<MattermostChannel>(this, this->channels);
 }

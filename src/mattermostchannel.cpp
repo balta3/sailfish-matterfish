@@ -34,3 +34,13 @@ void MattermostChannel::setDisplayName(const QString &value)
 {
     displayName = value;
 }
+
+QString MattermostChannel::getName() const
+{
+    return name;
+}
+
+void MattermostChannel::setName(const QString &value)
+{
+    name = value;
+}
