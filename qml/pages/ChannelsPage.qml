@@ -37,14 +37,14 @@ Page {
                 id: channelLabel
                 text: model.type + " - " + model.displayName
                 anchors.leftMargin: Theme.paddingMedium
-                visible: model.type !== "D"
+                //visible: model.type !== "D"
             }
-            Label {
-                id: dmLabel
-                text: MattermostClient.selectedTeam.getMemberByDirectMessageChannelId(model.id).userId
-                anchors.leftMargin: Theme.paddingMedium
-                visible: model.type === "D"
-            }
+            //Label {
+            //    id: dmLabel
+            //    text: MattermostClient.selectedTeam.getMemberByDirectMessageChannelId(model.id).userId
+            //    anchors.leftMargin: Theme.paddingMedium
+            //    visible: model.type === "D"
+            //}
         }
     }
 }

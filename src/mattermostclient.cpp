@@ -2,6 +2,7 @@
 
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QUrlQuery>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -98,6 +99,18 @@ void MattermostClient::refreshTeamMembers(MattermostTeam *team) {
     this->netAccessManager->get(request);
 }
 
+void MattermostClient::refreshUsers() {
+    QUrl usersURL = this->baseURL;
+    usersURL.setPath("/api/v4/users");
+    usersURL.setQuery(QUrlQuery("per_page=200"));
+
+    QNetworkRequest request;
+    request.setUrl(usersURL);
+    request.setRawHeader(QString("Authorization").toUtf8(), QString("Bearer " + this->token).toUtf8());
+
+    this->netAccessManager->get(request);
+}
+
 void MattermostClient::onResponse(QNetworkReply *reply) {
     QNetworkReply::NetworkError error = reply->error();
     if (error == QNetworkReply::NoError) {
@@ -108,7 +121,7 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             qDebug() << "Token:" << this->token;
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
             this->user = doc.object().toVariantMap();
-            this->refreshTeams();
+            this->refreshUsers();
         } else if (path.endsWith("teams")) {
             qDebug() << "teams";
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
@@ -143,6 +156,14 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
                 channel->setDisplayName(obj["display_name"].toString());
                 channel->setType(obj["type"].toString());
                 team->addChannel(channel);
+                if (channel->getType() == "D") {
+                    QString userId = channel->getName().remove(this->user["id"].toString()).remove("_");
+                    if (this->users.contains(userId)) {
+                        channel->setDisplayName(this->users[userId]->getUsername());
+                    } else {
+                        qDebug() << "missing user id" << userId;
+                    }
+                }
             }
         } else if (path.endsWith("channels/members")) {
             qDebug() << "members";
@@ -159,6 +180,23 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
                 member->setChannelId(obj["channel_id"].toString());
                 team->addMember(member);
             }
+        } else if (path.endsWith("/users")) {
+            qDebug() << "users";
+            this->users.clear();
+            QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+            QJsonArray usersJson = doc.array();
+            foreach (const QJsonValue &userJson, usersJson) {
+                QJsonObject obj = userJson.toObject();
+                MattermostUser* user = new MattermostUser(this);
+                user->setId(obj["id"].toString());
+                user->setUsername(obj["username"].toString());
+                user->setFirstname(obj["first_name"].toString());
+                user->setLastname(obj["last_name"].toString());
+                user->setNickname(obj["nickname"].toString());
+                this->users.insert(user->getId(), user);
+            }
+            qDebug() << "got" << this->users.size() << "users";
+            this->refreshTeams();
         } else {
             qDebug() << "unknown reply: " << path;
         }

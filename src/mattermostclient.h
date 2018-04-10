@@ -4,11 +4,13 @@
 #include <QObject>
 #include <QVariantMap>
 #include <QList>
+#include <QMap>
 #include <QUrl>
 #include <QNetworkAccessManager>
 #include <QQmlListProperty>
 
 #include "mattermostteam.h"
+#include "mattermostuser.h"
 
 class MattermostClient : public QObject {
     Q_OBJECT
@@ -45,6 +47,7 @@ public slots:
     void refreshTeams();
     void refreshChannels(MattermostTeam* team);
     void refreshTeamMembers(MattermostTeam* team);
+    void refreshUsers();
     void onResponse(QNetworkReply* reply);
 
 private:
@@ -53,6 +56,7 @@ private:
     QString password;
     QVariantMap user;
     QList<MattermostTeam*> teams;
+    QMap<QString, MattermostUser*> users;
 
     MattermostTeam* selectedTeam;
 

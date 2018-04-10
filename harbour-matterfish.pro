@@ -19,7 +19,8 @@ SOURCES += src/harbour-matterfish.cpp \
     src/mattermostclient.cpp \
     src/mattermostteam.cpp \
     src/mattermostchannel.cpp \
-    src/mattermostteammember.cpp
+    src/mattermostteammember.cpp \
+    src/mattermostuser.cpp
 
 DISTFILES += qml/harbour-matterfish.qml \
     qml/cover/CoverPage.qml \
@@ -50,4 +51,5 @@ HEADERS += \
     src/mattermostclient.h \
     src/mattermostteam.h \
     src/mattermostchannel.h \
-    src/mattermostteammember.h
+    src/mattermostteammember.h \
+    src/mattermostuser.h
