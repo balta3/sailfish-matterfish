@@ -45,6 +45,7 @@ signals:
 public slots:
     void connectToHost();
     void refreshTeams();
+    void refreshTeamUnreads();
     void refreshChannels(MattermostTeam* team);
     void refreshTeamMembers(MattermostTeam* team);
     void refreshUsers();

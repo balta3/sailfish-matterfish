@@ -15,6 +15,11 @@ TARGET = harbour-matterfish
 CONFIG += sailfishapp
 CONFIG += c++11
 
+QMAKE_CXXFLAGS_DEBUG -= -O1
+QMAKE_CXXFLAGS_DEBUG -= -O2
+QMAKE_CXXFLAGS_DEBUG -= -O3
+QMAKE_CXXFLAGS_DEBUG *= -O0
+
 SOURCES += src/harbour-matterfish.cpp \
     src/mattermostclient.cpp \
     src/mattermostteam.cpp \

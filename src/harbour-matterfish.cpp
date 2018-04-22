@@ -10,9 +10,7 @@ static QObject* clientGen(QQmlEngine *engine, QJSEngine *scriptEngine) {
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
     MattermostClient* client = new MattermostClient();
-    client->setHost("chat.wissenswerft.net");
-    client->setUsername("marcel.witte@wissenswerft.net");
-    client->setPassword("dXOImedw");
+
     return client;
 }
 

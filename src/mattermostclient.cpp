@@ -77,6 +77,17 @@ void MattermostClient::refreshTeams() {
     this->netAccessManager->get(request);
 }
 
+void MattermostClient::refreshTeamUnreads() {
+    QUrl teamsURL = this->baseURL;
+    teamsURL.setPath("/api/v4/users/" + this->user["id"].toString() + "/teams/unread");
+
+    QNetworkRequest request;
+    request.setUrl(teamsURL);
+    request.setRawHeader(QString("Authorization").toUtf8(), QString("Bearer " + this->token).toUtf8());
+
+    this->netAccessManager->get(request);
+}
+
 void MattermostClient::refreshChannels(MattermostTeam* team) {
     QUrl channelsUrl = this->baseURL;
     channelsUrl.setPath("/api/v4/users/" + this->user["id"].toString() + "/teams/" + team->getId() + "/channels");
@@ -137,8 +148,23 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             emit this->teamsChanged();
             foreach (MattermostTeam* team, this->teams) {
                 qDebug() << "refresh team:" << team->getDisplayName();
+                this->refreshTeamUnreads();
                 this->refreshChannels(team);
-                this->refreshTeamMembers(team);
+            }
+        } else if (path.endsWith("teams/unread")) {
+            qDebug() << "team unreads";
+            QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+            QJsonArray unreadsJson = doc.array();
+            foreach (const QJsonValue &unreadJson, unreadsJson) {
+                QJsonObject obj = unreadJson.toObject();
+                QString teamId = obj["team_id"].toString();
+                MattermostTeam* team = *std::find_if(this->teams.begin(), this->teams.end(), [teamId] (MattermostTeam* t) {return t->getId() == teamId; });
+                if (team) {
+                    team->setMessageCount(obj["msg_count"].toInt());
+                    team->setMentionCount(obj["mention_count"].toInt());
+                } else {
+                    qDebug() << "cannot find team" << teamId;
+                }
             }
         } else if (path.endsWith("channels")) {
             qDebug() << "channels";
@@ -155,6 +181,16 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
                 channel->setName(obj["name"].toString());
                 channel->setDisplayName(obj["display_name"].toString());
                 channel->setType(obj["type"].toString());
+                channel->setTotalMsgCount(obj["total_msg_count"].toInt());
+                qDebug() << channel->getTotalMsgCount() << obj["total_msg_count"].toInt();
+                qlonglong lastUpdateTimestamp = obj["update_at"].toVariant().toLongLong();
+                QDateTime lastUpdate;
+                lastUpdate.setTime_t(lastUpdateTimestamp / 1000);
+                channel->setLastUpdated(lastUpdate);
+                qlonglong lastPostAtTimestamp = obj["last_post_at"].toVariant().toLongLong();
+                QDateTime lastPostAt;
+                lastPostAt.setTime_t(lastPostAtTimestamp / 1000);
+                channel->setLastPostAt(lastPostAt);
                 team->addChannel(channel);
                 if (channel->getType() == "D") {
                     QString userId = channel->getName().remove(this->user["id"].toString()).remove("_");
@@ -165,6 +201,7 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
                     }
                 }
             }
+            this->refreshTeamMembers(team);
         } else if (path.endsWith("channels/members")) {
             qDebug() << "members";
             QStringList pathParts = path.split("/");
@@ -178,7 +215,22 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
                 MattermostTeamMember* member = new MattermostTeamMember(team);
                 member->setUserId(obj["user_id"].toString());
                 member->setChannelId(obj["channel_id"].toString());
+                qlonglong lastUpdateTimestamp = obj["last_update_at"].toVariant().toLongLong();
+                qlonglong lastViewedTimestamp = obj["last_viewed_at"].toVariant().toLongLong();
+                QDateTime lastUpdate;
+                lastUpdate.setTime_t(lastUpdateTimestamp / 1000);
+                QDateTime lastViewed;
+                lastViewed.setTime_t(lastViewedTimestamp / 1000);
+                member->setLastUpdated(lastUpdate);
+                member->setLastViewed(lastViewed);
+                member->setMsgCount(obj["msg_count"].toInt());
                 team->addMember(member);
+                QList<MattermostChannel*> channels = team->getChannels();
+                QList<MattermostChannel*>::iterator channelIt = std::find_if(channels.begin(), channels.end(), [member] (MattermostChannel* c) {return c->getId() == member->getChannelId(); });
+                if (*channelIt && channelIt != team->getChannels().end()) {
+                    MattermostChannel* channel = *channelIt;
+                    channel->setMember(member);
+                }
             }
         } else if (path.endsWith("/users")) {
             qDebug() << "users";

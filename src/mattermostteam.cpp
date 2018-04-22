@@ -60,6 +60,28 @@ MattermostTeamMember *MattermostTeam::getMemberByDirectMessageChannelId(QString 
     return member;
 }
 
+quint16 MattermostTeam::getMessageCount() const
+{
+    return messageCount;
+}
+
+void MattermostTeam::setMessageCount(quint16 value)
+{
+    messageCount = value;
+    emit this->messageCountChanged(this->messageCount);
+}
+
+quint16 MattermostTeam::getMentionCount() const
+{
+    return mentionCount;
+}
+
+void MattermostTeam::setMentionCount(quint16 value)
+{
+    mentionCount = value;
+    emit this->mentionCountChanged(this->mentionCount);
+}
+
 QQmlListProperty<MattermostChannel> MattermostTeam::getChannelsQML() {
     return QQmlListProperty<MattermostChannel>(this, this->channels);
 }

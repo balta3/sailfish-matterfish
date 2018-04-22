@@ -2,7 +2,8 @@
 
 MattermostChannel::MattermostChannel(QObject *parent) : QObject(parent)
 {
-
+    this->member = 0;
+    this->totalMsgCount = 0;
 }
 
 QString MattermostChannel::getId() const
@@ -33,6 +34,60 @@ QString MattermostChannel::getDisplayName() const
 void MattermostChannel::setDisplayName(const QString &value)
 {
     displayName = value;
+}
+
+QDateTime MattermostChannel::getLastUpdated() const
+{
+    return lastUpdated;
+}
+
+void MattermostChannel::setLastUpdated(const QDateTime &value)
+{
+    lastUpdated = value;
+}
+
+MattermostTeamMember *MattermostChannel::getMember() const
+{
+    return member;
+}
+
+void MattermostChannel::setMember(MattermostTeamMember *value)
+{
+    member = value;
+    emit this->memberChanged(*this->member);
+    emit this->unreadChanged(this->isUnread());
+}
+
+bool MattermostChannel::isUnread()
+{
+    if (!this->member) {
+        return false;
+    }
+    return this->totalMsgCount > 0 && this->lastPostAt > this->member->getLastViewed();
+}
+
+uint MattermostChannel::getTotalMsgCount() const
+{
+    return totalMsgCount;
+}
+
+void MattermostChannel::setTotalMsgCount(const uint &value)
+{
+    totalMsgCount = value;
+    emit this->totalMsgCountChanged(this->totalMsgCount);
+    emit this->unreadChanged(this->isUnread());
+}
+
+QDateTime MattermostChannel::getLastPostAt() const
+{
+    return lastPostAt;
+}
+
+void MattermostChannel::setLastPostAt(const QDateTime &value)
+{
+    lastPostAt = value;
+    emit this->lastPostAtChanged(this->lastPostAt);
+    emit this->unreadChanged(this->isUnread());
 }
 
 QString MattermostChannel::getName() const

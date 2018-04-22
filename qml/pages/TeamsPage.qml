@@ -32,8 +32,24 @@ Page {
             Label {
                 id: teamLabel
                 text: model.displayName
+                anchors.left: parent.left
                 anchors.leftMargin: Theme.paddingMedium
             }
+            Label {
+                id: messageCountLabel
+                text: model.messageCount
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.paddingMedium
+                visible: model.messageCount > 0
+            }
+            Label {
+                id: mentionCountLabel
+                text: model.mentionCount
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.paddingMedium
+                visible: model.mentionCount > 0
+            }
+
             onClicked: {
                 console.log(model.modelData)
                 MattermostClient.selectedTeam = model.modelData
