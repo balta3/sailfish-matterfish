@@ -90,6 +90,33 @@ void MattermostChannel::setLastPostAt(const QDateTime &value)
     emit this->unreadChanged(this->isUnread());
 }
 
+QList<MattermostPost *> MattermostChannel::getPosts() const
+{
+    return posts;
+}
+
+void MattermostChannel::setPosts(const QList<MattermostPost *> &value)
+{
+    posts = value;
+}
+
+void MattermostChannel::addPost(MattermostPost *post)
+{
+    this->posts.prepend(post);
+    emit this->postsChanged();
+}
+
+void MattermostChannel::clearPosts()
+{
+    this->posts.clear();
+    emit this->postsChanged();
+}
+
+QQmlListProperty<MattermostPost> MattermostChannel::getPostsQML()
+{
+    return QQmlListProperty<MattermostPost>(this, this->posts);
+}
+
 QString MattermostChannel::getName() const
 {
     return name;

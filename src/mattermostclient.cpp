@@ -7,7 +7,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDebug>
-#include <algorithm>
 
 MattermostClient::MattermostClient(QObject *parent) : QObject(parent)
 {
@@ -48,6 +47,7 @@ void MattermostClient::setPassword(const QString &value)
 void MattermostClient::connectToHost() {
     this->baseURL.setScheme("https");
     this->baseURL.setHost(this->host);
+    emit this->baseURLChanged(this->baseURL);
 
     QUrl loginURL = this->baseURL;
     loginURL.setPath("/api/v4/users/login");
@@ -122,6 +122,17 @@ void MattermostClient::refreshUsers() {
     this->netAccessManager->get(request);
 }
 
+void MattermostClient::refreshChannelPosts(MattermostChannel *channel) {
+    QUrl channelsUrl = this->baseURL;
+    channelsUrl.setPath("/api/v4/channels/" + channel->getId() + "/posts");
+
+    QNetworkRequest request;
+    request.setUrl(channelsUrl);
+    request.setRawHeader(QString("Authorization").toUtf8(), QString("Bearer " + this->token).toUtf8());
+
+    this->netAccessManager->get(request);
+}
+
 void MattermostClient::onResponse(QNetworkReply *reply) {
     QNetworkReply::NetworkError error = reply->error();
     if (error == QNetworkReply::NoError) {
@@ -182,7 +193,6 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
                 channel->setDisplayName(obj["display_name"].toString());
                 channel->setType(obj["type"].toString());
                 channel->setTotalMsgCount(obj["total_msg_count"].toInt());
-                qDebug() << channel->getTotalMsgCount() << obj["total_msg_count"].toInt();
                 qlonglong lastUpdateTimestamp = obj["update_at"].toVariant().toLongLong();
                 QDateTime lastUpdate;
                 lastUpdate.setTime_t(lastUpdateTimestamp / 1000);
@@ -249,12 +259,71 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             }
             qDebug() << "got" << this->users.size() << "users";
             this->refreshTeams();
+        } else if (path.endsWith("/posts")) {
+            qDebug() << "posts";
+            QStringList pathParts = path.split("/");
+            QString channelId = pathParts[pathParts.size() - 2];
+            MattermostChannel* channel;
+            foreach (MattermostTeam* team, this->teams) {
+                QList<MattermostChannel*> channels = team->getChannels();
+                QList<MattermostChannel*>::iterator channelIt = std::find_if(channels.begin(), channels.end(), [channelId] (MattermostChannel* c) {return c->getId() == channelId;});
+                if (*channelIt && channelIt != channels.end()) {
+                    channel = *channelIt;
+                }
+            }
+            if (channel) {
+                channel->clearPosts();
+                QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+                QJsonObject container = doc.object();
+                QJsonArray orderArray = container["order"].toArray();
+                QJsonObject posts = container["posts"].toObject();
+                foreach (const QJsonValue &orderJson, orderArray) {
+                    QString postId = orderJson.toString();
+                    QJsonObject postJson = posts[postId].toObject();
+                    MattermostPost* post = new MattermostPost(channel);
+                    post->setMessage(postJson["message"].toString());
+                    qlonglong createdTimestamp = postJson["create_at"].toVariant().toLongLong();
+                    QDateTime created;
+                    created.setTime_t(createdTimestamp / 1000);
+                    post->setCreated(created);
+                    MattermostUser* user = this->users[postJson["user_id"].toString()];
+                    post->setUser(user);
+                    channel->addPost(post);
+                }
+            }
         } else {
             qDebug() << "unknown reply: " << path;
         }
     } else {
         qDebug() << "response error: " << reply->errorString();
     }
+}
+
+QUrl MattermostClient::getBaseURL() const
+{
+    return baseURL;
+}
+
+void MattermostClient::setBaseURL(const QUrl &value)
+{
+    baseURL = value;
+}
+
+QString MattermostClient::getAuthorization()
+{
+    return QString("Bearer " + this->token);
+}
+
+MattermostChannel *MattermostClient::getSelectedChannel() const
+{
+    return selectedChannel;
+}
+
+void MattermostClient::setSelectedChannel(MattermostChannel *value)
+{
+    selectedChannel = value;
+    emit this->selectedChannelChanged(this->selectedChannel);
+    this->refreshChannelPosts(value);
 }
 
 MattermostTeam *MattermostClient::getSelectedTeam() const

@@ -26,13 +26,8 @@ Page {
             }
         }
 
-        //height: parent.height - pageHeader.height
-        //anchors.topMargin: pageHeader.height
         model: MattermostClient.selectedTeam.channels
         delegate: ListItem {
-            //width: parent.width
-            //height: Theme.itemSizeSmall
-            //height: childrenRect.height + Theme.paddingMedium
             Label {
                 id: channelLabel
                 text: model.type + " - " + model.displayName
@@ -42,23 +37,11 @@ Page {
                 //visible: model.type !== "D"
             }
 
-            Label {
-                id: dates
-                text: model.member.lastViewed.toLocaleDateString(Qt.locale("de_DE")) + " - " + model.lastPostAt.toLocaleDateString(Qt.locale("de_DE"))
-                //text: MattermostClient.selectedTeam.getMemberByDirectMessageChannelId(model.id).lastUpdated.toLocaleDateString(Qt.locale("de_DE")) + " - " + MattermostClient.selectedTeam.getMemberByDirectMessageChannelId(model.id).lastViewed.toLocaleDateString(Qt.locale("de_DE"))
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.paddingMedium
-                font.pixelSize: Theme.fontSizeExtraSmall
-                visible: false
+            onClicked: {
+                console.log(model.modelData)
+                MattermostClient.selectedChannel = model.modelData
+                pageStack.push(Qt.resolvedUrl("PostsPage.qml"))
             }
-
-            //Label {
-            //    id: dmLabel
-            //    text: MattermostClient.selectedTeam.getMemberByDirectMessageChannelId(model.id).userId
-            //    anchors.leftMargin: Theme.paddingMedium
-            //    visible: model.type === "D"
-            //}
         }
     }
 }

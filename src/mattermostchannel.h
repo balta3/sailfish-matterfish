@@ -2,8 +2,11 @@
 #define MATTERMOSTCHANNEL_H
 
 #include <QObject>
+#include <QList>
+#include <QQmlListProperty>
 
 #include "mattermostteammember.h"
+#include "mattermostpost.h"
 
 class MattermostChannel : public QObject
 {
@@ -17,6 +20,7 @@ class MattermostChannel : public QObject
     Q_PROPERTY(uint totalMsgCount READ getTotalMsgCount WRITE setTotalMsgCount NOTIFY totalMsgCountChanged)
     Q_PROPERTY(QDateTime lastUpdated READ getLastUpdated WRITE setLastUpdated NOTIFY lastUpdatedChanged)
     Q_PROPERTY(QDateTime lastPostAt READ getLastPostAt WRITE setLastPostAt NOTIFY lastPostAtChanged)
+    Q_PROPERTY(QQmlListProperty<MattermostPost> posts READ getPostsQML NOTIFY postsChanged)
 public:
     explicit MattermostChannel(QObject *parent = nullptr);
 
@@ -46,6 +50,13 @@ public:
     QDateTime getLastPostAt() const;
     void setLastPostAt(const QDateTime &value);
 
+    QList<MattermostPost *> getPosts() const;
+    void setPosts(const QList<MattermostPost *> &value);
+
+    void addPost(MattermostPost* post);
+    void clearPosts();
+    QQmlListProperty<MattermostPost> getPostsQML();
+
 signals:
     void idChanged(const QString &value);
     void typeChanged(const QString &value);
@@ -56,6 +67,7 @@ signals:
     void totalMsgCountChanged(const uint &value);
     void lastUpdatedChanged(const QDateTime &value);
     void lastPostAtChanged(const QDateTime &value);
+    void postsChanged();
 
 public slots:
 
@@ -68,6 +80,7 @@ private:
     QDateTime lastPostAt;
     MattermostTeamMember* member;
     uint totalMsgCount;
+    QList<MattermostPost*> posts;
 };
 
 #endif // MATTERMOSTCHANNEL_H

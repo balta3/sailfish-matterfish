@@ -25,7 +25,9 @@ SOURCES += src/harbour-matterfish.cpp \
     src/mattermostteam.cpp \
     src/mattermostchannel.cpp \
     src/mattermostteammember.cpp \
-    src/mattermostuser.cpp
+    src/mattermostuser.cpp \
+    src/mattermostpost.cpp \
+    src/mattermostavatarimageprovider.cpp
 
 DISTFILES += qml/harbour-matterfish.qml \
     qml/cover/CoverPage.qml \
@@ -38,7 +40,8 @@ DISTFILES += qml/harbour-matterfish.qml \
     harbour-matterfish.desktop \
     qml/pages/LoginPage.qml \
     qml/pages/TeamsPage.qml \
-    qml/pages/ChannelsPage.qml
+    qml/pages/ChannelsPage.qml \
+    qml/pages/PostsPage.qml
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
@@ -57,4 +60,6 @@ HEADERS += \
     src/mattermostteam.h \
     src/mattermostchannel.h \
     src/mattermostteammember.h \
-    src/mattermostuser.h
+    src/mattermostuser.h \
+    src/mattermostpost.h \
+    src/mattermostavatarimageprovider.h

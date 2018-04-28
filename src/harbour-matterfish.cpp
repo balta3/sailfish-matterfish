@@ -5,12 +5,14 @@
 #include <sailfishapp.h>
 
 #include "mattermostclient.h"
+#include "mattermostavatarimageprovider.h"
 
 static QObject* clientGen(QQmlEngine *engine, QJSEngine *scriptEngine) {
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
     MattermostClient* client = new MattermostClient();
 
+    engine->addImageProvider("avatar", new MattermostAvatarImageProvider(client));
     return client;
 }
 
@@ -29,5 +31,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<MattermostTeam>("harbour.matterfish", 1, 0, "MattermostTeam", "");
     qmlRegisterUncreatableType<MattermostChannel>("harbour.matterfish", 1, 0, "MattermostChannel", "");
     qmlRegisterUncreatableType<MattermostTeamMember>("harbour.matterfish", 1, 0, "MattermostTeamMember", "");
+    qmlRegisterUncreatableType<MattermostPost>("harbour.matterfish", 1, 0, "MattermostPost", "");
+    qmlRegisterUncreatableType<MattermostUser>("harbour.matterfish", 1, 0, "MattermostUser", "");
     return SailfishApp::main(argc, argv);
 }
