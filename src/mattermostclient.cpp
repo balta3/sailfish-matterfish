@@ -264,12 +264,10 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             QStringList pathParts = path.split("/");
             QString channelId = pathParts[pathParts.size() - 2];
             MattermostChannel* channel;
-            foreach (MattermostTeam* team, this->teams) {
-                QList<MattermostChannel*> channels = team->getChannels();
-                QList<MattermostChannel*>::iterator channelIt = std::find_if(channels.begin(), channels.end(), [channelId] (MattermostChannel* c) {return c->getId() == channelId;});
-                if (*channelIt && channelIt != channels.end()) {
-                    channel = *channelIt;
-                }
+            QList<MattermostChannel*> channels = this->selectedTeam->getChannels();
+            QList<MattermostChannel*>::iterator channelIt = std::find_if(channels.begin(), channels.end(), [channelId] (MattermostChannel* c) {return c->getId() == channelId;});
+            if (*channelIt && channelIt != channels.end()) {
+                channel = *channelIt;
             }
             if (channel) {
                 channel->clearPosts();

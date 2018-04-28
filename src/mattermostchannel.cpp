@@ -102,7 +102,7 @@ void MattermostChannel::setPosts(const QList<MattermostPost *> &value)
 
 void MattermostChannel::addPost(MattermostPost *post)
 {
-    this->posts.prepend(post);
+    this->posts << post;
     emit this->postsChanged();
 }
 

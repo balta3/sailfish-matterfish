@@ -9,18 +9,29 @@ Page {
     // The effective value will be restricted by ApplicationWindow.allowedOrientations
     allowedOrientations: Orientation.All
 
+    PageHeader {
+        id: pageHeader
+        title: MattermostClient.selectedChannel.displayName
+    }
+
     SilicaListView {
         id: listView
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.top: pageHeader.bottom
 
-        header: Column {
-            width: parent.width
-            height: pageHeader.height
-            PageHeader {
-                id: pageHeader
-                title: MattermostClient.selectedChannel.displayName
-            }
-        }
+        property bool autoScrollToBottom: true
+
+        clip: true
+        verticalLayoutDirection: ListView.BottomToTop
+
+        /*Component.onCompleted: {
+            console.log("onCompleted")
+            MattermostClient.selectedChannel.postsChanged.connect(function() {
+                console.log("postsChanged");
+            })
+        }*/
 
         model: MattermostClient.selectedChannel.posts
         delegate: ListItem {

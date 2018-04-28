@@ -13,18 +13,19 @@ Page {
         console.log(MattermostClient.selectedTeam.channels);
     }
 
+    PageHeader {
+        id: pageHeader
+        title: MattermostClient.selectedTeam.displayName + "(" + MattermostClient.selectedTeam.messageCount + ")"
+    }
+
     SilicaListView {
         id: listView
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.top: pageHeader.bottom
 
-        header: Column {
-            width: parent.width
-            height: pageHeader.height
-            PageHeader {
-                id: pageHeader
-                title: MattermostClient.selectedTeam.displayName + "(" + MattermostClient.selectedTeam.channels.length + ")"
-            }
-        }
+        clip: true
 
         model: MattermostClient.selectedTeam.channels
         delegate: ListItem {
