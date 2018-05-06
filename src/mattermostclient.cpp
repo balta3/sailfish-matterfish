@@ -278,24 +278,8 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
                 channel = *channelIt;
             }
             if (channel) {
-                channel->clearPosts();
                 QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-                QJsonObject container = doc.object();
-                QJsonArray orderArray = container["order"].toArray();
-                QJsonObject posts = container["posts"].toObject();
-                foreach (const QJsonValue &orderJson, orderArray) {
-                    QString postId = orderJson.toString();
-                    QJsonObject postJson = posts[postId].toObject();
-                    MattermostPost* post = new MattermostPost(channel);
-                    post->setMessage(postJson["message"].toString());
-                    qlonglong createdTimestamp = postJson["create_at"].toVariant().toLongLong();
-                    QDateTime created;
-                    created.setTime_t(createdTimestamp / 1000);
-                    post->setCreated(created);
-                    MattermostUser* user = this->users[postJson["user_id"].toString()];
-                    post->setUser(user);
-                    channel->addPost(post);
-                }
+                channel->updatePosts(doc, this->users);
             }
         } else {
             qDebug() << "unknown reply: " << path;

@@ -1,5 +1,8 @@
 #include "mattermostchannel.h"
 
+#include <QJsonObject>
+#include <QJsonArray>
+
 MattermostChannel::MattermostChannel(QObject *parent) : QObject(parent)
 {
     this->member = 0;
@@ -125,4 +128,24 @@ QString MattermostChannel::getName() const
 void MattermostChannel::setName(const QString &value)
 {
     name = value;
+}
+
+void MattermostChannel::updatePosts(QJsonDocument& doc, QMap<QString, MattermostUser*> users) {
+    this->clearPosts();
+    QJsonObject container = doc.object();
+    QJsonArray orderArray = container["order"].toArray();
+    QJsonObject posts = container["posts"].toObject();
+    foreach (const QJsonValue &orderJson, orderArray) {
+        QString postId = orderJson.toString();
+        QJsonObject postJson = posts[postId].toObject();
+        MattermostPost* post = new MattermostPost(this);
+        post->setMessage(postJson["message"].toString());
+        qlonglong createdTimestamp = postJson["create_at"].toVariant().toLongLong();
+        QDateTime created;
+        created.setTime_t(createdTimestamp / 1000);
+        post->setCreated(created);
+        MattermostUser* user = users[postJson["user_id"].toString()];
+        post->setUser(user);
+        this->addPost(post);
+    }
 }

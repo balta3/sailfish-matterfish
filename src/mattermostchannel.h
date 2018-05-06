@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QList>
 #include <QQmlListProperty>
+#include <QJsonDocument>
 
 #include "mattermostteammember.h"
 #include "mattermostpost.h"
@@ -56,6 +57,7 @@ public:
     void addPost(MattermostPost* post);
     void clearPosts();
     QQmlListProperty<MattermostPost> getPostsQML();
+    void updatePosts(QJsonDocument& doc, QMap<QString, MattermostUser*> users);
 
 signals:
     void idChanged(const QString &value);
