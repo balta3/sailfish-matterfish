@@ -63,3 +63,7 @@ HEADERS += \
     src/mattermostuser.h \
     src/mattermostpost.h \
     src/mattermostavatarimageprovider.h
+
+PKGCONFIG += Qt5WebSockets
+
+QT += websockets

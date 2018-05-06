@@ -12,6 +12,10 @@ MattermostClient::MattermostClient(QObject *parent) : QObject(parent)
 {
     this->netAccessManager = new QNetworkAccessManager(this);
     QObject::connect(this->netAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onResponse(QNetworkReply*)));
+    this->webSocket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
+    QObject::connect(this->webSocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onWebSocketMessage(QString)));
+    QObject::connect(this->webSocket, SIGNAL(connected()), this, SLOT(onWebSocketConnected()));
+    QObject::connect(this->webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onWebSocketError(QAbstractSocket::SocketError)));
 }
 
 QString MattermostClient::getHost() const
@@ -144,6 +148,10 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
             this->user = doc.object().toVariantMap();
             this->refreshUsers();
+            QUrl websocketURL = this->baseURL;
+            websocketURL.setScheme("wss");
+            websocketURL.setPath("/api/v4/websocket");
+            this->webSocket->open(websocketURL);
         } else if (path.endsWith("teams")) {
             qDebug() << "teams";
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
@@ -295,6 +303,40 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
     } else {
         qDebug() << "response error: " << reply->errorString();
     }
+}
+
+void MattermostClient::onWebSocketConnected() {
+    this->webSocketSeq = 1;
+    QVariantMap websocketAuthMap;
+    QVariantMap websocketAuthMapData;
+    websocketAuthMapData["token"] = this->token;
+    websocketAuthMap["seq"] = this->webSocketSeq++;
+    websocketAuthMap["action"] = "authentication_challenge";
+    websocketAuthMap["data"] = websocketAuthMapData;
+    QJsonDocument websocketAuthJson = QJsonDocument::fromVariant(websocketAuthMap);
+    this->webSocket->sendTextMessage(QString(websocketAuthJson.toJson()));
+}
+
+void MattermostClient::onWebSocketMessage(QString messageStr) {
+    QJsonDocument messageDoc = QJsonDocument::fromJson(messageStr.toUtf8());
+    QJsonObject message = messageDoc.object();
+    if (message.contains("status") && message.contains("seq_reply")) {
+        qDebug() << "Seq" << message["seq_reply"].toInt() << "status" << message["status"].toString();
+    } else if (message.contains("event") && message.contains("data")) {
+        QString event = message["event"].toString();
+        QJsonObject data = message["data"].toObject();
+        if (event == "hello") {
+            qDebug() << "Server version" << data["server_version"].toString();
+        } else {
+            qDebug() << "Unknown event:" << event << messageStr;
+        }
+    } else {
+        qDebug() << "Got unknown message" << messageStr;
+    }
+}
+
+void MattermostClient::onWebSocketError(QAbstractSocket::SocketError error) {
+    qDebug() << "websocket error" << this->webSocket->errorString();
 }
 
 QUrl MattermostClient::getBaseURL() const

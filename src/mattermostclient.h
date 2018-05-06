@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QUrl>
 #include <QNetworkAccessManager>
+#include <QWebSocket>
 #include <QQmlListProperty>
 
 #include "mattermostteam.h"
@@ -64,6 +65,9 @@ public slots:
     void refreshUsers();
     void refreshChannelPosts(MattermostChannel* channel);
     void onResponse(QNetworkReply* reply);
+    void onWebSocketConnected();
+    void onWebSocketMessage(QString message);
+    void onWebSocketError(QAbstractSocket::SocketError error);
 
 private:
     QString host;
@@ -78,6 +82,8 @@ private:
 
     QUrl baseURL;
     QNetworkAccessManager* netAccessManager;
+    QWebSocket* webSocket;
+    quint64 webSocketSeq;
     QString token;
 };
 
