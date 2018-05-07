@@ -137,6 +137,25 @@ void MattermostClient::refreshChannelPosts(MattermostChannel *channel) {
     this->netAccessManager->get(request);
 }
 
+void MattermostClient::sendNewMessage() {
+    QUrl postUrl = this->baseURL;
+    postUrl.setPath("/api/v4/posts");
+
+    QNetworkRequest request;
+    request.setUrl(postUrl);
+    request.setRawHeader(QString("Authorization").toUtf8(), QString("Bearer " + this->token).toUtf8());
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QVariantMap msgPost;
+    msgPost["channel_id"] = this->selectedChannel->getId();
+    msgPost["message"] = this->newMessage;
+    QJsonDocument doc = QJsonDocument::fromVariant(msgPost);
+
+    this->netAccessManager->post(request, doc.toJson());
+
+    this->setNewMessage("");
+}
+
 void MattermostClient::onResponse(QNetworkReply *reply) {
     QNetworkReply::NetworkError error = reply->error();
     if (error == QNetworkReply::NoError) {
@@ -321,6 +340,17 @@ void MattermostClient::onWebSocketMessage(QString messageStr) {
 
 void MattermostClient::onWebSocketError(QAbstractSocket::SocketError error) {
     qDebug() << "websocket error" << this->webSocket->errorString();
+}
+
+QString MattermostClient::getNewMessage() const
+{
+    return newMessage;
+}
+
+void MattermostClient::setNewMessage(const QString &value)
+{
+    newMessage = value;
+    emit this->newMessageChanged(this->newMessage);
 }
 
 QUrl MattermostClient::getBaseURL() const

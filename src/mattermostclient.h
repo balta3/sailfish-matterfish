@@ -21,6 +21,7 @@ class MattermostClient : public QObject {
     Q_PROPERTY(QString password READ getPassword WRITE setPassword NOTIFY passwordChanged)
     Q_PROPERTY(MattermostTeam* selectedTeam READ getSelectedTeam WRITE setSelectedTeam NOTIFY selectedTeamChanged)
     Q_PROPERTY(MattermostChannel* selectedChannel READ getSelectedChannel WRITE setSelectedChannel NOTIFY selectedChannelChanged)
+    Q_PROPERTY(QString newMessage READ getNewMessage WRITE setNewMessage NOTIFY newMessageChanged)
     Q_PROPERTY(QQmlListProperty<MattermostTeam> teams READ getTeamsQML NOTIFY teamsChanged)
     Q_PROPERTY(QUrl baseURL READ getBaseURL WRITE setBaseURL NOTIFY baseURLChanged)
 public:
@@ -48,6 +49,9 @@ public:
 
     QString getAuthorization();
 
+    QString getNewMessage() const;
+    void setNewMessage(const QString &value);
+
 signals:
     void hostChanged(const QString& host);
     void usernameChanged(const QString& username);
@@ -56,6 +60,8 @@ signals:
     void selectedChannelChanged(const MattermostChannel* channel);
     void teamsChanged();
     void baseURLChanged(const QUrl& value);
+    void newMessageChanged(const QString& newMessage);
+
 public slots:
     void connectToHost();
     void refreshTeams();
@@ -68,6 +74,7 @@ public slots:
     void onWebSocketConnected();
     void onWebSocketMessage(QString message);
     void onWebSocketError(QAbstractSocket::SocketError error);
+    void sendNewMessage();
 
 private:
     QString host;
@@ -79,6 +86,7 @@ private:
 
     MattermostTeam* selectedTeam;
     MattermostChannel* selectedChannel;
+    QString newMessage;
 
     QUrl baseURL;
     QNetworkAccessManager* netAccessManager;

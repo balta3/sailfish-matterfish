@@ -9,6 +9,13 @@
     </message>
 </context>
 <context>
+    <name>PostsPage</name>
+    <message>
+        <source>Reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SecondPage</name>
     <message>
         <source>Nested Page</source>

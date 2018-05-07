@@ -6,12 +6,17 @@ import harbour.matterfish 1.0;
 Page {
     id: postsPage
 
-    // The effective value will be restricted by ApplicationWindow.allowedOrientations
     allowedOrientations: Orientation.All
 
     PageHeader {
         id: pageHeader
         title: MattermostClient.selectedChannel.displayName
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Reload")
+            }
+        }
     }
 
     SilicaListView {
@@ -26,12 +31,26 @@ Page {
         clip: true
         verticalLayoutDirection: ListView.BottomToTop
 
-        /*Component.onCompleted: {
-            console.log("onCompleted")
-            MattermostClient.selectedChannel.postsChanged.connect(function() {
-                console.log("postsChanged");
-            })
-        }*/
+        header: Item {
+            height: newMessageTextField.height
+            width: parent.width
+
+            TextArea {
+                id: newMessageTextField
+                anchors.left: parent.left
+                anchors.right: sendButton.left
+                anchors.bottom: parent.bottom
+            }
+            IconButton {
+                id: sendButton
+                anchors.right: parent.right
+                anchors.top: parent.top
+                icon.source: "image://theme/icon-m-message?" + (newMessageTextField.text.length > 0
+                                                             ? Theme.primaryColor
+                                                             : Theme.highlightColor)
+                onClicked: MattermostClient.sendNewMessage();
+            }
+        }
 
         model: MattermostClient.selectedChannel.posts
         delegate: ListItem {
@@ -81,6 +100,13 @@ Page {
                 anchors.topMargin: dateLabel.height + Theme.paddingSmall
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
+            }
+        }
+
+        PushUpMenu {
+            MenuItem {
+                text: qsTr("Reload")
+                onClicked: MattermostClient.refreshChannelPosts(MattermostClient.selectedChannel)
             }
         }
     }
