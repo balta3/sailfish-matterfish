@@ -40,6 +40,7 @@ Page {
                 anchors.left: parent.left
                 anchors.right: sendButton.left
                 anchors.bottom: parent.bottom
+                text: MattermostClient.newMessage
             }
             IconButton {
                 id: sendButton
@@ -48,7 +49,10 @@ Page {
                 icon.source: "image://theme/icon-m-message?" + (newMessageTextField.text.length > 0
                                                              ? Theme.primaryColor
                                                              : Theme.highlightColor)
-                onClicked: MattermostClient.sendNewMessage();
+                onClicked: {
+                    MattermostClient.newMessage = newMessageTextField.text;
+                    MattermostClient.sendNewMessage();
+                }
             }
         }
 

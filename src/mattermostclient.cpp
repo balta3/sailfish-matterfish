@@ -138,6 +138,7 @@ void MattermostClient::refreshChannelPosts(MattermostChannel *channel) {
 }
 
 void MattermostClient::sendNewMessage() {
+    qDebug() << this->newMessage;
     QUrl postUrl = this->baseURL;
     postUrl.setPath("/api/v4/posts");
 
@@ -286,7 +287,7 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             }
             qDebug() << "got" << this->users.size() << "users";
             this->refreshTeams();
-        } else if (path.endsWith("/posts")) {
+        } else if (path.endsWith("/posts") && path.contains("/channels/")) {
             qDebug() << "posts";
             QStringList pathParts = path.split("/");
             QString channelId = pathParts[pathParts.size() - 2];
