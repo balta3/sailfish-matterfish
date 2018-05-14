@@ -4,16 +4,12 @@
 #include <QNetworkReply>
 #include <QDebug>
 
-MattermostAsyncImageResponse::MattermostAsyncImageResponse(QString userid, QUrl baseURL, QString authorization) {
-    qDebug() << "loading avatar for user" << userid;
+MattermostAsyncImageResponse::MattermostAsyncImageResponse(QUrl url, QString authorization) {
     this->netAccessManager = new QNetworkAccessManager(this);
     QObject::connect(this->netAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onResponse(QNetworkReply*)));
 
-    QUrl avatarURL = baseURL;
-    avatarURL.setPath("/api/v4/users/" + userid + "/image");
-
     QNetworkRequest request;
-    request.setUrl(avatarURL);
+    request.setUrl(url);
     request.setRawHeader(QString("Authorization").toUtf8(), authorization.toUtf8());
 
     this->netAccessManager->get(request);
@@ -39,6 +35,21 @@ MattermostAvatarImageProvider::MattermostAvatarImageProvider(MattermostClient* m
 
 QQuickImageResponse *MattermostAvatarImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
 {
-    MattermostAsyncImageResponse* resp = new MattermostAsyncImageResponse(id, this->client->getBaseURL(), this->client->getAuthorization());
+    QUrl avatarURL = this->client->getBaseURL();
+    avatarURL.setPath("/api/v4/users/" + id + "/image");
+    MattermostAsyncImageResponse* resp = new MattermostAsyncImageResponse(avatarURL, this->client->getAuthorization());
+    return resp;
+}
+
+MattermostTeamIconImageProvider::MattermostTeamIconImageProvider(MattermostClient *mattermostClient) : QQuickAsyncImageProvider()
+{
+    this->client = mattermostClient;
+}
+
+QQuickImageResponse *MattermostTeamIconImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
+{
+    QUrl teamIconURL = this->client->getBaseURL();
+    teamIconURL.setPath("/api/v4/teams/" + id + "/image");
+    MattermostAsyncImageResponse* resp = new MattermostAsyncImageResponse(teamIconURL, this->client->getAuthorization());
     return resp;
 }

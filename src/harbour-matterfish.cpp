@@ -13,6 +13,7 @@ static QObject* clientGen(QQmlEngine *engine, QJSEngine *scriptEngine) {
     MattermostClient* client = new MattermostClient();
 
     engine->addImageProvider("avatar", new MattermostAvatarImageProvider(client));
+    engine->addImageProvider("team", new MattermostTeamIconImageProvider(client));
     return client;
 }
 

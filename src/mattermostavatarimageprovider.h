@@ -8,7 +8,7 @@
 class MattermostAsyncImageResponse : public QQuickImageResponse {
     Q_OBJECT
 public:
-    MattermostAsyncImageResponse(QString userid, QUrl baseURL, QString authorization);
+    MattermostAsyncImageResponse(QUrl url, QString authorization);
 
     QQuickTextureFactory *textureFactory() const;
 
@@ -24,6 +24,16 @@ class MattermostAvatarImageProvider : public QQuickAsyncImageProvider
 {
 public:
     MattermostAvatarImageProvider(MattermostClient* mattermostClient);
+    QQuickImageResponse* requestImageResponse(const QString &id, const QSize &requestedSize);
+
+private:
+    MattermostClient* client;
+};
+
+class MattermostTeamIconImageProvider : public QQuickAsyncImageProvider
+{
+public:
+    MattermostTeamIconImageProvider(MattermostClient* mattermostClient);
     QQuickImageResponse* requestImageResponse(const QString &id, const QSize &requestedSize);
 
 private:

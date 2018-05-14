@@ -29,24 +29,55 @@ Page {
             //width: parent.width
             //height: Theme.itemSizeSmall
             //height: childrenRect.height + Theme.paddingMedium
-            Label {
-                id: teamLabel
-                text: model.displayName
+            height: icon.height + Theme.paddingMedium
+            Image {
+                id: icon
+                source: "image://team/" + model.id
+                anchors.top: parent.top
+                anchors.topMargin: Theme.paddingMedium
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.paddingMedium
             }
             Label {
-                id: messageCountLabel
-                text: model.messageCount
+                id: teamLabel
+                text: model.displayName
+                anchors.left: icon.right
+                anchors.leftMargin: Theme.paddingMedium
+                anchors.top: parent.top
+                anchors.topMargin: Theme.paddingMedium
+            }
+            Image {
+                id: messageCountIcon
+                source: "image://theme/icon-s-message"
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.paddingMedium
+                anchors.top: parent.top
+                anchors.topMargin: Theme.paddingMedium
                 visible: model.messageCount > 0
+            }
+            Label {
+                id: messageCountLabel
+                text: model.messageCount
+                anchors.right: messageCountIcon.left
+                anchors.rightMargin: Theme.paddingMedium
+                anchors.bottom: messageCountIcon.bottom
+                visible: model.messageCount > 0
+            }
+            Label {
+                id: mentionCountIcon
+                text: "@"
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.paddingMedium
+                anchors.top: messageCountIcon.bottom
+                anchors.topMargin: Theme.paddingMedium
+                visible: model.mentionCount > 0
             }
             Label {
                 id: mentionCountLabel
                 text: model.mentionCount
-                anchors.right: parent.right
+                anchors.right: mentionCountIcon.left
                 anchors.rightMargin: Theme.paddingMedium
+                anchors.bottom: mentionCountIcon.bottom
                 visible: model.mentionCount > 0
             }
 
