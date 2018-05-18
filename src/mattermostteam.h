@@ -56,6 +56,7 @@ private:
     QList<MattermostTeamMember*> members;
     quint16 messageCount;
     quint16 mentionCount;
+    void sortChannels();
 };
 
 #endif // MATTERMOSTTEAM_H

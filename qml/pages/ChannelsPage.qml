@@ -27,11 +27,24 @@ Page {
 
         clip: true
 
+        section {
+            property: "type"
+            delegate: SectionHeader {
+                text: switch(section) {
+                      case "D": return qsTr("Direct message");
+                      case "G": return qsTr("Group message");
+                      case "O": return qsTr("Public channel");
+                      case "P": return qsTr("Private channel");
+                      default: return "Unbekannt";
+                      }
+            }
+        }
+
         model: MattermostClient.selectedTeam.channels
         delegate: ListItem {
             Label {
                 id: channelLabel
-                text: model.type + " - " + model.displayName
+                text: model.displayName
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.paddingMedium
                 color: model.unread ? Theme.highlightColor : Theme.primaryColor

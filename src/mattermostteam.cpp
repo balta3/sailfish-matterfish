@@ -1,5 +1,7 @@
 #include "mattermostteam.h"
 
+#include <algorithm>
+
 MattermostTeam::MattermostTeam(QObject *parent) : QObject(parent)
 {
 
@@ -33,6 +35,7 @@ QList<MattermostChannel *> MattermostTeam::getChannels()
 void MattermostTeam::addChannel(MattermostChannel *channel)
 {
     this->channels.append(channel);
+    this->sortChannels();
     emit this->channelsChanged();
 }
 
@@ -58,6 +61,19 @@ MattermostTeamMember *MattermostTeam::getMemberByDirectMessageChannelId(QString 
 {
     MattermostTeamMember* member = *std::find_if(this->members.begin(), this->members.end(), [channelId] (MattermostTeamMember* m) {return m->getChannelId() == channelId; });
     return member;
+}
+
+void MattermostTeam::sortChannels()
+{
+    QStringList typeOrder;
+    typeOrder << "O" << "P" << "D" << "G";
+    std::sort(this->channels.begin(), this->channels.end(), [typeOrder](MattermostChannel* a, MattermostChannel* b) -> bool {
+        if (a->getType() == b->getType()) {
+            return a->getDisplayName() < b->getDisplayName();
+        } else {
+            return typeOrder.indexOf(a->getType()) < typeOrder.indexOf(b->getType());
+        }
+    });
 }
 
 quint16 MattermostTeam::getMessageCount() const

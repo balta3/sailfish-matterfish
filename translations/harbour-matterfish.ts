@@ -2,6 +2,25 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>ChannelsPage</name>
+    <message>
+        <source>Direct message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Public channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Private channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CoverPage</name>
     <message>
         <source>My Cover</source>
