@@ -27,7 +27,9 @@ SOURCES += src/harbour-matterfish.cpp \
     src/mattermostteammember.cpp \
     src/mattermostuser.cpp \
     src/mattermostpost.cpp \
-    src/mattermostavatarimageprovider.cpp
+    src/mattermostavatarimageprovider.cpp \
+    src/qmlsettingswrapper.cpp \
+    src/matterfishsettings.cpp
 
 DISTFILES += qml/harbour-matterfish.qml \
     qml/cover/CoverPage.qml \
@@ -62,8 +64,10 @@ HEADERS += \
     src/mattermostteammember.h \
     src/mattermostuser.h \
     src/mattermostpost.h \
-    src/mattermostavatarimageprovider.h
+    src/mattermostavatarimageprovider.h \
+    src/qmlsettingswrapper.h \
+    src/matterfishsettings.h
 
 PKGCONFIG += Qt5WebSockets
 
-QT += websockets
+# QT += websockets

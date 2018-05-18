@@ -9,6 +9,21 @@
     </message>
 </context>
 <context>
+    <name>LoginPage</name>
+    <message>
+        <source>Host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PostsPage</name>
     <message>
         <source>Reload</source>

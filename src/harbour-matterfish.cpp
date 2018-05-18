@@ -4,6 +4,7 @@
 
 #include <sailfishapp.h>
 
+#include "matterfishsettings.h"
 #include "mattermostclient.h"
 #include "mattermostavatarimageprovider.h"
 
@@ -15,6 +16,13 @@ static QObject* clientGen(QQmlEngine *engine, QJSEngine *scriptEngine) {
     engine->addImageProvider("avatar", new MattermostAvatarImageProvider(client));
     engine->addImageProvider("team", new MattermostTeamIconImageProvider(client));
     return client;
+}
+
+static QObject* settingsGen(QQmlEngine *engine, QJSEngine *scriptEngine) {
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
+    MatterfishSettings* settings = new MatterfishSettings();
+    return settings;
 }
 
 int main(int argc, char *argv[])
@@ -29,6 +37,7 @@ int main(int argc, char *argv[])
     //
     // To display the view, call "show()" (will show fullscreen on device).
     qmlRegisterSingletonType<MattermostClient>("harbour.matterfish", 1, 0, "MattermostClient", clientGen);
+    qmlRegisterSingletonType<MatterfishSettings>("harbour.matterfish", 1, 0, "MatterfishSettings", settingsGen);
     qmlRegisterUncreatableType<MattermostTeam>("harbour.matterfish", 1, 0, "MattermostTeam", "");
     qmlRegisterUncreatableType<MattermostChannel>("harbour.matterfish", 1, 0, "MattermostChannel", "");
     qmlRegisterUncreatableType<MattermostTeamMember>("harbour.matterfish", 1, 0, "MattermostTeamMember", "");

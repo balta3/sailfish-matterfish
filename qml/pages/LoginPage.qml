@@ -11,8 +11,11 @@ Dialog {
     canAccept: true
 
     onDone: {
+        MatterfishSettings.host = host.text;
         MattermostClient.host = host.text;
+        MatterfishSettings.username = username.text;
         MattermostClient.username = username.text;
+        MatterfishSettings.password = password.text;
         MattermostClient.password = password.text;
         MattermostClient.connectToHost();
     }
@@ -24,30 +27,34 @@ Dialog {
 
     Column {
         anchors.top: header.bottom
+        anchors.left: parent.left
+        anchors.leftMargin: Theme.paddingMedium
+        anchors.right: parent.right
+        anchors.rightMargin: Theme.paddingMedium
         width: parent.width
         Label {
-            text: "Host"
+            text: qsTr("Host")
         }
         TextField {
             id: host
             width: parent.width
-            text: MattermostClient.host
+            text: MatterfishSettings.host
         }
         Label {
-            text: "Benutzername"
+            text: qsTr("Username")
         }
         TextField {
             id: username
             width: parent.width
-            text: MattermostClient.username
+            text: MatterfishSettings.username
         }
         Label {
-            text: "Passwort"
+            text: qsTr("Password")
         }
-        TextField {
+        PasswordField {
             id: password
             width: parent.width
-            text: MattermostClient.password
+            text: MatterfishSettings.password
         }
     }
 }
