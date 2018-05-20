@@ -24,6 +24,9 @@ class MattermostClient : public QObject {
     Q_PROPERTY(QString newMessage READ getNewMessage WRITE setNewMessage NOTIFY newMessageChanged)
     Q_PROPERTY(QQmlListProperty<MattermostTeam> teams READ getTeamsQML NOTIFY teamsChanged)
     Q_PROPERTY(QUrl baseURL READ getBaseURL WRITE setBaseURL NOTIFY baseURLChanged)
+    Q_PROPERTY(quint16 messageCount READ getMessageCount WRITE setMessageCount NOTIFY messageCountChanged)
+    Q_PROPERTY(quint16 mentionCount READ getMentionCount WRITE setMentionCount NOTIFY mentionCountChanged)
+    Q_PROPERTY(QString state READ getState WRITE setState NOTIFY stateChanged)
 public:
     explicit MattermostClient(QObject *parent = nullptr);
 
@@ -52,6 +55,15 @@ public:
     QString getNewMessage() const;
     void setNewMessage(const QString &value);
 
+    quint16 getMessageCount() const;
+    void setMessageCount(quint16 value);
+
+    quint16 getMentionCount() const;
+    void setMentionCount(quint16 value);
+
+    QString getState() const;
+    void setState(const QString &value);
+
 signals:
     void hostChanged(const QString& host);
     void usernameChanged(const QString& username);
@@ -61,6 +73,9 @@ signals:
     void teamsChanged();
     void baseURLChanged(const QUrl& value);
     void newMessageChanged(const QString& newMessage);
+    void messageCountChanged(quint16 &value);
+    void mentionCountChanged(quint16 &value);
+    void stateChanged(QString &value);
 
 public slots:
     void connectToHost();
@@ -87,6 +102,9 @@ private:
     MattermostTeam* selectedTeam;
     MattermostChannel* selectedChannel;
     QString newMessage;
+    quint16 messageCount;
+    quint16 mentionCount;
+    QString state;
 
     QUrl baseURL;
     QNetworkAccessManager* netAccessManager;

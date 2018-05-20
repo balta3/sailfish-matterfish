@@ -16,6 +16,7 @@ MattermostClient::MattermostClient(QObject *parent) : QObject(parent)
     QObject::connect(this->webSocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onWebSocketMessage(QString)));
     QObject::connect(this->webSocket, SIGNAL(connected()), this, SLOT(onWebSocketConnected()));
     QObject::connect(this->webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onWebSocketError(QAbstractSocket::SocketError)));
+    this->state = "offline";
 }
 
 QString MattermostClient::getHost() const
@@ -157,6 +158,17 @@ void MattermostClient::sendNewMessage() {
     this->setNewMessage("");
 }
 
+QString MattermostClient::getState() const
+{
+    return this->state;
+}
+
+void MattermostClient::setState(const QString &value)
+{
+    this->state = value;
+    emit this->stateChanged(this->state);
+}
+
 void MattermostClient::onResponse(QNetworkReply *reply) {
     QNetworkReply::NetworkError error = reply->error();
     if (error == QNetworkReply::NoError) {
@@ -194,6 +206,8 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             qDebug() << "team unreads";
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
             QJsonArray unreadsJson = doc.array();
+            this->messageCount = 0;
+            this->mentionCount = 0;
             foreach (const QJsonValue &unreadJson, unreadsJson) {
                 QJsonObject obj = unreadJson.toObject();
                 QString teamId = obj["team_id"].toString();
@@ -201,10 +215,14 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
                 if (team) {
                     team->setMessageCount(obj["msg_count"].toInt());
                     team->setMentionCount(obj["mention_count"].toInt());
+                    this->messageCount += obj["msg_count"].toInt();
+                    this->mentionCount += obj["mention_count"].toInt();
                 } else {
                     qDebug() << "cannot find team" << teamId;
                 }
             }
+            emit this->messageCountChanged(this->messageCount);
+            emit this->mentionCountChanged(this->mentionCount);
         } else if (path.endsWith("channels")) {
             qDebug() << "channels";
             QStringList pathParts = path.split("/");
@@ -319,6 +337,7 @@ void MattermostClient::onWebSocketConnected() {
     websocketAuthMap["data"] = websocketAuthMapData;
     QJsonDocument websocketAuthJson = QJsonDocument::fromVariant(websocketAuthMap);
     this->webSocket->sendTextMessage(QString(websocketAuthJson.toJson()));
+    this->setState("online");
 }
 
 void MattermostClient::onWebSocketMessage(QString messageStr) {
@@ -341,6 +360,7 @@ void MattermostClient::onWebSocketMessage(QString messageStr) {
 
 void MattermostClient::onWebSocketError(QAbstractSocket::SocketError error) {
     qDebug() << "websocket error" << this->webSocket->errorString();
+    this->setState("offline");
 }
 
 QString MattermostClient::getNewMessage() const
@@ -394,4 +414,22 @@ void MattermostClient::setSelectedTeam(MattermostTeam *value)
 
 QQmlListProperty<MattermostTeam> MattermostClient::getTeamsQML() {
     return QQmlListProperty<MattermostTeam>(this, this->teams);
+}
+
+quint16 MattermostClient::getMessageCount() const {
+    return this->messageCount;
+}
+
+quint16 MattermostClient::getMentionCount() const {
+    return this->mentionCount;
+}
+
+void MattermostClient::setMessageCount(quint16 value) {
+    this->messageCount = value;
+    emit this->messageCountChanged(this->messageCount);
+}
+
+void MattermostClient::setMentionCount(quint16 value) {
+    this->mentionCount = value;
+    emit this->mentionCountChanged(this->mentionCount);
 }
