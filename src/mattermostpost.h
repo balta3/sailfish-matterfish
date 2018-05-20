@@ -11,6 +11,7 @@ class MattermostPost : public QObject
     Q_OBJECT
     Q_PROPERTY(QString message READ getMessage WRITE setMessage NOTIFY messageChanged)
     Q_PROPERTY(QDateTime created READ getCreated WRITE setCreated)
+    Q_PROPERTY(QString createdDay READ getCreatedDay())
     Q_PROPERTY(MattermostUser* user READ getUser)
 public:
     explicit MattermostPost(QObject *parent = nullptr);
@@ -20,6 +21,8 @@ public:
 
     QDateTime getCreated() const;
     void setCreated(const QDateTime &value);
+
+    QString getCreatedDay() const;
 
     MattermostUser *getUser() const;
     void setUser(MattermostUser *value);

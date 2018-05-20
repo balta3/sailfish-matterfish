@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1">
+<TS version="2.1" language="de_DE" sourcelanguage="en">
 <context>
     <name>ChannelsPage</name>
     <message>
-        <source>Direct message</source>
-        <translation type="unfinished"></translation>
+        <source>Direct messages</source>
+        <translation>Direktnachrichten</translation>
     </message>
     <message>
-        <source>Group message</source>
-        <translation type="unfinished"></translation>
+        <source>Group messages</source>
+        <translation>Gruppennachrichten</translation>
     </message>
     <message>
-        <source>Public channel</source>
-        <translation type="unfinished"></translation>
+        <source>Public channels</source>
+        <translation>Öffentliche Kanäle</translation>
     </message>
     <message>
-        <source>Private channel</source>
-        <translation type="unfinished"></translation>
+        <source>Private channels</source>
+        <translation>Private Kanäle</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Unbekannt</translation>
     </message>
 </context>
 <context>
@@ -31,22 +35,22 @@
     <name>LoginPage</name>
     <message>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Host</translation>
     </message>
     <message>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzername</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwort</translation>
     </message>
 </context>
 <context>
     <name>PostsPage</name>
     <message>
         <source>Reload</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu laden</translation>
     </message>
 </context>
 <context>

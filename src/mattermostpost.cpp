@@ -1,5 +1,7 @@
 #include "mattermostpost.h"
 
+#include <QLocale>
+
 MattermostPost::MattermostPost(QObject *parent) : QObject(parent)
 {
 
@@ -18,6 +20,11 @@ void MattermostPost::setMessage(const QString &value)
 QDateTime MattermostPost::getCreated() const
 {
     return created;
+}
+
+QString MattermostPost::getCreatedDay() const
+{
+    return created.date().toString(QLocale::system().dateFormat(QLocale::LongFormat));
 }
 
 void MattermostPost::setCreated(const QDateTime &value)

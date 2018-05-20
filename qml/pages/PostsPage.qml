@@ -56,16 +56,24 @@ Page {
             }
         }
 
+        section {
+            property: "createdDay"
+            delegate: SectionHeader {
+                text: section
+            }
+        }
+
         model: MattermostClient.selectedChannel.posts
         delegate: ListItem {
             height: userLabel.height + Theme.paddingMedium + messageLabel.height < Theme.paddingMedium + userLabel.height + 2 + avatar.height ?
                         Theme.paddingMedium + userLabel.height + 2 + avatar.height
                       : userLabel.height + Theme.paddingMedium + messageLabel.height
+            contentHeight: height
 
             Label {
                 id: userLabel
                 text: model.user.username
-                anchors.left: parent.left
+                anchors.left: avatar.right
                 anchors.leftMargin: Theme.paddingMedium
                 anchors.top: parent.top
                 anchors.topMargin: Theme.paddingMedium
@@ -74,8 +82,8 @@ Page {
             }
 
             Label {
-                id: dateLabel
-                text: model.created.toLocaleString()
+                id: timeLabel
+                text: model.created.toLocaleTimeString(Qt.locale(), Locale.ShortFormat)
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.paddingMedium
                 anchors.top: parent.top
@@ -88,9 +96,11 @@ Page {
                 id: avatar
                 source: "image://avatar/" + model.user.id
                 anchors.top: parent.top
-                anchors.topMargin: Theme.paddingMedium + userLabel.height + 2
+                anchors.topMargin: Theme.paddingMedium
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.paddingMedium
+                height: 128
+                width: 128
             }
 
             Label {
@@ -101,7 +111,7 @@ Page {
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.paddingMedium
                 anchors.top: parent.top
-                anchors.topMargin: dateLabel.height + Theme.paddingSmall
+                anchors.topMargin: timeLabel.height + Theme.paddingSmall
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
             }

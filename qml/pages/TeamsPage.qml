@@ -26,10 +26,9 @@ Page {
         //anchors.topMargin: pageHeader.height
         model: MattermostClient.teams
         delegate: ListItem {
-            //width: parent.width
-            //height: Theme.itemSizeSmall
-            //height: childrenRect.height + Theme.paddingMedium
             height: icon.height + Theme.paddingMedium
+            contentHeight: height
+
             Image {
                 id: icon
                 source: "image://team/" + model.id
@@ -37,6 +36,8 @@ Page {
                 anchors.topMargin: Theme.paddingMedium
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.paddingMedium
+                height: 128
+                width: 128
             }
             Label {
                 id: teamLabel

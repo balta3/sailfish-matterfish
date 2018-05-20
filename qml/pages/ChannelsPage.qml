@@ -31,11 +31,11 @@ Page {
             property: "type"
             delegate: SectionHeader {
                 text: switch(section) {
-                      case "D": return qsTr("Direct message");
-                      case "G": return qsTr("Group message");
-                      case "O": return qsTr("Public channel");
-                      case "P": return qsTr("Private channel");
-                      default: return "Unbekannt";
+                      case "D": return qsTr("Direct messages");
+                      case "G": return qsTr("Group messages");
+                      case "O": return qsTr("Public channels");
+                      case "P": return qsTr("Private channels");
+                      default: return qsTr("Unknown");
                       }
             }
         }
