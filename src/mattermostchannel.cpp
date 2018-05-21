@@ -111,7 +111,7 @@ void MattermostChannel::addPost(MattermostPost *post)
     } else {
         QList<MattermostPost*>::iterator end = this->posts.end();
         QList<MattermostPost*>::iterator p = this->posts.begin();
-        while (p != end && (((MattermostPost*)*p)->getCreated() > post->getCreated())) {
+        while (p != end && (((MattermostPost*)*p)->getCreated() < post->getCreated())) {
             p++;
         }
         this->posts.insert(p, post);

@@ -29,9 +29,8 @@ Page {
         property bool autoScrollToBottom: true
 
         clip: true
-        verticalLayoutDirection: ListView.BottomToTop
 
-        header: Item {
+        footer: Item {
             height: newMessageTextField.height
             width: parent.width
 
