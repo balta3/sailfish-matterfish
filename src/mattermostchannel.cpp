@@ -59,6 +59,7 @@ void MattermostChannel::setMember(MattermostTeamMember *value)
     member = value;
     emit this->memberChanged(*this->member);
     emit this->unreadChanged(this->isUnread());
+    connect(value, SIGNAL(lastViewedChanged(QDateTime)), this, SLOT(memberLastViewedChanged(QDateTime)));
 }
 
 bool MattermostChannel::isUnread()
@@ -105,8 +106,20 @@ void MattermostChannel::setPosts(const QList<MattermostPost *> &value)
 
 void MattermostChannel::addPost(MattermostPost *post)
 {
-    this->posts << post;
+    if (this->posts.isEmpty()) {
+        this->posts << post;
+    } else {
+        QList<MattermostPost*>::iterator end = this->posts.end();
+        QList<MattermostPost*>::iterator p = this->posts.begin();
+        while (p != end && (((MattermostPost*)*p)->getCreated() > post->getCreated())) {
+            p++;
+        }
+        this->posts.insert(p, post);
+    }
     emit this->postsChanged();
+    if (this->lastPostAt < post->getCreated()) {
+        this->setLastPostAt(post->getCreated());
+    }
 }
 
 void MattermostChannel::clearPosts()
@@ -138,14 +151,23 @@ void MattermostChannel::updatePosts(QJsonDocument& doc, QMap<QString, Mattermost
     foreach (const QJsonValue &orderJson, orderArray) {
         QString postId = orderJson.toString();
         QJsonObject postJson = posts[postId].toObject();
-        MattermostPost* post = new MattermostPost(this);
-        post->setMessage(postJson["message"].toString());
-        qlonglong createdTimestamp = postJson["create_at"].toVariant().toLongLong();
-        QDateTime created;
-        created.setTime_t(createdTimestamp / 1000);
-        post->setCreated(created);
-        MattermostUser* user = users[postJson["user_id"].toString()];
-        post->setUser(user);
-        this->addPost(post);
+        this->addPost(postJson, users);
     }
+}
+
+void MattermostChannel::memberLastViewedChanged(const QDateTime &value)
+{
+    emit this->unreadChanged(this->isUnread());
+}
+
+void MattermostChannel::addPost(QJsonObject &postJson, QMap<QString, MattermostUser*> users) {
+    MattermostPost* post = new MattermostPost(this);
+    post->setMessage(postJson["message"].toString());
+    qlonglong createdTimestamp = postJson["create_at"].toVariant().toLongLong();
+    QDateTime created;
+    created.setTime_t(createdTimestamp / 1000);
+    post->setCreated(created);
+    MattermostUser* user = users[postJson["user_id"].toString()];
+    post->setUser(user);
+    this->addPost(post);
 }

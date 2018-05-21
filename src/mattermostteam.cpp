@@ -59,8 +59,16 @@ void MattermostTeam::addMember(MattermostTeamMember *member)
 
 MattermostTeamMember *MattermostTeam::getMemberByDirectMessageChannelId(QString channelId)
 {
-    MattermostTeamMember* member = *std::find_if(this->members.begin(), this->members.end(), [channelId] (MattermostTeamMember* m) {return m->getChannelId() == channelId; });
-    return member;
+    return *std::find_if(this->members.begin(), this->members.end(), [channelId] (MattermostTeamMember* m) {return m->getChannelId() == channelId; });
+}
+
+MattermostChannel *MattermostTeam::findChannelById(QString channelId)
+{
+    QList<MattermostChannel*>::iterator channelIt = std::find_if(channels.begin(), channels.end(), [channelId] (MattermostChannel* c) {return c->getId() == channelId;});
+    if (*channelIt && channelIt != channels.end()) {
+        return *channelIt;
+    }
+    return 0;
 }
 
 void MattermostTeam::sortChannels()

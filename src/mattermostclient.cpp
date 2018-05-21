@@ -66,8 +66,6 @@ void MattermostClient::connectToHost() {
     loginData.insert("password", this->password);
     QByteArray payload = QJsonDocument::fromVariant(loginData).toJson();
 
-    qDebug() << payload;
-
     this->netAccessManager->post(request, payload);
 }
 
@@ -169,6 +167,11 @@ void MattermostClient::setState(const QString &value)
     emit this->stateChanged(this->state);
 }
 
+MattermostTeam* MattermostClient::findTeamById(QString teamId)
+{
+    return *std::find_if(this->teams.begin(), this->teams.end(), [teamId] (MattermostTeam* t) {return t->getId() == teamId; });
+}
+
 void MattermostClient::onResponse(QNetworkReply *reply) {
     QNetworkReply::NetworkError error = reply->error();
     if (error == QNetworkReply::NoError) {
@@ -227,7 +230,7 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             qDebug() << "channels";
             QStringList pathParts = path.split("/");
             QString teamId = pathParts[pathParts.size() - 2];
-            MattermostTeam* team = *std::find_if(this->teams.begin(), this->teams.end(), [teamId] (MattermostTeam* t) {return t->getId() == teamId; });
+            MattermostTeam* team = this->findTeamById(teamId);
             team->clearChannels();
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
             QJsonArray channelsJson = doc.array();
@@ -262,7 +265,7 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             qDebug() << "members";
             QStringList pathParts = path.split("/");
             QString teamId = pathParts[pathParts.size() - 3];
-            MattermostTeam* team = *std::find_if(this->teams.begin(), this->teams.end(), [teamId] (MattermostTeam* t) {return t->getId() == teamId; });
+            MattermostTeam* team = this->findTeamById(teamId);
             team->clearMembers();
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
             QJsonArray membersJson = doc.array();
@@ -281,12 +284,16 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
                 member->setLastViewed(lastViewed);
                 member->setMsgCount(obj["msg_count"].toInt());
                 team->addMember(member);
-                QList<MattermostChannel*> channels = team->getChannels();
-                QList<MattermostChannel*>::iterator channelIt = std::find_if(channels.begin(), channels.end(), [member] (MattermostChannel* c) {return c->getId() == member->getChannelId(); });
-                if (*channelIt && channelIt != team->getChannels().end()) {
-                    MattermostChannel* channel = *channelIt;
+                MattermostChannel* channel = team->findChannelById(member->getChannelId());
+                if (channel) {
                     channel->setMember(member);
                 }
+                //QList<MattermostChannel*> channels = team->getChannels();
+                //QList<MattermostChannel*>::iterator channelIt = std::find_if(channels.begin(), channels.end(), [member] (MattermostChannel* c) {return c->getId() == member->getChannelId(); });
+                //if (*channelIt && channelIt != team->getChannels().end()) {
+                //    MattermostChannel* channel = *channelIt;
+                //    channel->setMember(member);
+                //}
             }
         } else if (path.endsWith("/users")) {
             qDebug() << "users";
@@ -309,12 +316,7 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             qDebug() << "posts";
             QStringList pathParts = path.split("/");
             QString channelId = pathParts[pathParts.size() - 2];
-            MattermostChannel* channel;
-            QList<MattermostChannel*> channels = this->selectedTeam->getChannels();
-            QList<MattermostChannel*>::iterator channelIt = std::find_if(channels.begin(), channels.end(), [channelId] (MattermostChannel* c) {return c->getId() == channelId;});
-            if (*channelIt && channelIt != channels.end()) {
-                channel = *channelIt;
-            }
+            MattermostChannel* channel = this->selectedTeam->findChannelById(channelId);
             if (channel) {
                 QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
                 channel->updatePosts(doc, this->users);
@@ -348,8 +350,32 @@ void MattermostClient::onWebSocketMessage(QString messageStr) {
     } else if (message.contains("event") && message.contains("data")) {
         QString event = message["event"].toString();
         QJsonObject data = message["data"].toObject();
+        QJsonObject broadcast = message["broadcast"].toObject();
         if (event == "hello") {
             qDebug() << "Server version" << data["server_version"].toString();
+        } else if (event == "posted") {
+            qDebug() << "New post in channel" << data["channel_name"].toString();
+            QString channelId = broadcast["channel_id"].toString();
+            foreach (MattermostTeam* team, this->teams) {
+                MattermostChannel* channel = team->findChannelById(channelId);
+                if (channel) {
+                    QString postJson = data["post"].toString();
+                    QJsonDocument postDoc = QJsonDocument::fromJson(postJson.toUtf8());
+                    QJsonObject postJsonObj = postDoc.object();
+                    channel->addPost(postJsonObj, this->users);
+                }
+            }
+            this->refreshTeamUnreads();
+        } else if (event == "channel_viewed") {
+            QString channelId = data["channel_id"].toString();
+            qDebug() << "Channel viewed:" << channelId;
+            foreach (MattermostTeam* team, this->teams) {
+                MattermostChannel* channel = team->findChannelById(channelId);
+                if (channel) {
+                    channel->getMember()->setLastViewed(QDateTime::currentDateTime());
+                }
+            }
+            this->refreshTeamUnreads();
         } else {
             qDebug() << "Unknown event:" << event << messageStr;
         }

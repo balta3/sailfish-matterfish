@@ -55,6 +55,7 @@ public:
     void setPosts(const QList<MattermostPost *> &value);
 
     void addPost(MattermostPost* post);
+    void addPost(QJsonObject& postJson, QMap<QString, MattermostUser*> users);
     void clearPosts();
     QQmlListProperty<MattermostPost> getPostsQML();
     void updatePosts(QJsonDocument& doc, QMap<QString, MattermostUser*> users);
@@ -72,6 +73,7 @@ signals:
     void postsChanged();
 
 public slots:
+    void memberLastViewedChanged(const QDateTime &value);
 
 private:
     QString id;

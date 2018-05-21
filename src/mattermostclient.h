@@ -111,6 +111,8 @@ private:
     QWebSocket* webSocket;
     quint64 webSocketSeq;
     QString token;
+
+    MattermostTeam* findTeamById(QString teamId);
 };
 
 #endif // MATTERMOSTCLIENT_H

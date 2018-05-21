@@ -39,6 +39,7 @@ public:
     void clearMembers();
     void addMember(MattermostTeamMember* member);
     Q_INVOKABLE MattermostTeamMember* getMemberByDirectMessageChannelId(QString channelId);
+    MattermostChannel* findChannelById(QString channelId);
 
 signals:
     void idChanged(const QString &value);
