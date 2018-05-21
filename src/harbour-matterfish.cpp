@@ -15,6 +15,7 @@ static QObject* clientGen(QQmlEngine *engine, QJSEngine *scriptEngine) {
 
     engine->addImageProvider("avatar", new MattermostAvatarImageProvider(client));
     engine->addImageProvider("team", new MattermostTeamIconImageProvider(client));
+    engine->addImageProvider("filethumbnail", new MattermostFileImageProvider(client));
     return client;
 }
 
@@ -43,5 +44,6 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<MattermostTeamMember>("harbour.matterfish", 1, 0, "MattermostTeamMember", "");
     qmlRegisterUncreatableType<MattermostPost>("harbour.matterfish", 1, 0, "MattermostPost", "");
     qmlRegisterUncreatableType<MattermostUser>("harbour.matterfish", 1, 0, "MattermostUser", "");
+    qmlRegisterUncreatableType<MattermostFile>("harbour.matterfish", 1, 0, "MattermostFile", "");
     return SailfishApp::main(argc, argv);
 }

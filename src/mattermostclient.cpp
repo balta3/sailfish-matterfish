@@ -156,6 +156,20 @@ void MattermostClient::sendNewMessage() {
     this->setNewMessage("");
 }
 
+void MattermostClient::initFile(QString fileId)
+{
+    qDebug() << "init file" << fileId;
+    QUrl infoUrl = this->baseURL;
+    infoUrl.setPath("/api/v4/files/" + fileId + "/info");
+
+    QNetworkRequest request;
+    request.setUrl(infoUrl);
+    request.setRawHeader(QString("Authorization").toUtf8(), QString("Bearer " + this->token).toUtf8());
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    this->netAccessManager->get(request);
+}
+
 QString MattermostClient::getState() const
 {
     return this->state;
@@ -288,12 +302,6 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
                 if (channel) {
                     channel->setMember(member);
                 }
-                //QList<MattermostChannel*> channels = team->getChannels();
-                //QList<MattermostChannel*>::iterator channelIt = std::find_if(channels.begin(), channels.end(), [member] (MattermostChannel* c) {return c->getId() == member->getChannelId(); });
-                //if (*channelIt && channelIt != team->getChannels().end()) {
-                //    MattermostChannel* channel = *channelIt;
-                //    channel->setMember(member);
-                //}
             }
         } else if (path.endsWith("/users")) {
             qDebug() << "users";
@@ -320,6 +328,20 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             if (channel) {
                 QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
                 channel->updatePosts(doc, this->users);
+            }
+        } else if (path.endsWith("/info") && path.contains("/files/")) {
+            qDebug() << "fileInfo";
+            QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+            QJsonObject fileJson = doc.object();
+            foreach(MattermostTeam* team, this->teams) {
+                MattermostFile *file = team->findFileById(fileJson["id"].toString());
+                if (file) {
+                    file->setName(fileJson["name"].toString());
+                    file->setExtension(fileJson["extension"].toString());
+                    file->setMimeType(fileJson["mime_type"].toString());
+                    file->setSize(fileJson["size"].toInt());
+                    file->setHasPreviewImage(fileJson["has_preview_image"].toBool());
+                }
             }
         } else {
             qDebug() << "unknown reply: " << path;

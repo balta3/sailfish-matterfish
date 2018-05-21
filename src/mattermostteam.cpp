@@ -71,6 +71,17 @@ MattermostChannel *MattermostTeam::findChannelById(QString channelId)
     return 0;
 }
 
+MattermostFile *MattermostTeam::findFileById(QString fileId)
+{
+    foreach (MattermostChannel* channel, this->channels) {
+        MattermostFile *file = channel->findFileById(fileId);
+        if (file) {
+            return file;
+        }
+    }
+    return 0;
+}
+
 void MattermostTeam::sortChannels()
 {
     QStringList typeOrder;

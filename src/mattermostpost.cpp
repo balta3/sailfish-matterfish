@@ -41,3 +41,19 @@ void MattermostPost::setUser(MattermostUser *value)
 {
     user = value;
 }
+
+QList<MattermostFile *> MattermostPost::getFiles() const
+{
+    return files;
+}
+
+QQmlListProperty<MattermostFile> MattermostPost::getFilesQML()
+{
+    return QQmlListProperty<MattermostFile>(this, this->files);
+}
+
+void MattermostPost::addFile(MattermostFile *file)
+{
+    this->files << file;
+    emit this->filesChanged();
+}

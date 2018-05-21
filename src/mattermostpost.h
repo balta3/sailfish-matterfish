@@ -3,8 +3,10 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <QQmlListProperty>
 
 #include "mattermostuser.h"
+#include "mattermostfile.h"
 
 class MattermostPost : public QObject
 {
@@ -13,6 +15,7 @@ class MattermostPost : public QObject
     Q_PROPERTY(QDateTime created READ getCreated WRITE setCreated)
     Q_PROPERTY(QString createdDay READ getCreatedDay())
     Q_PROPERTY(MattermostUser* user READ getUser)
+    Q_PROPERTY(QQmlListProperty<MattermostFile> files READ getFilesQML NOTIFY filesChanged)
 public:
     explicit MattermostPost(QObject *parent = nullptr);
 
@@ -27,8 +30,13 @@ public:
     MattermostUser *getUser() const;
     void setUser(MattermostUser *value);
 
+    QList<MattermostFile *> getFiles() const;
+    QQmlListProperty<MattermostFile> getFilesQML();
+    void addFile(MattermostFile* file);
+
 signals:
     void messageChanged(const QString* value);
+    void filesChanged();
 
 public slots:
 
@@ -36,6 +44,7 @@ private:
     QString message;
     QDateTime created;
     MattermostUser* user;
+    QList<MattermostFile*> files;
 };
 
 #endif // MATTERMOSTPOST_H

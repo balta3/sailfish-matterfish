@@ -40,6 +40,7 @@ public:
     void addMember(MattermostTeamMember* member);
     Q_INVOKABLE MattermostTeamMember* getMemberByDirectMessageChannelId(QString channelId);
     MattermostChannel* findChannelById(QString channelId);
+    MattermostFile* findFileById(QString fileId);
 
 signals:
     void idChanged(const QString &value);

@@ -90,6 +90,7 @@ public slots:
     void onWebSocketMessage(QString message);
     void onWebSocketError(QAbstractSocket::SocketError error);
     void sendNewMessage();
+    void initFile(QString fileId);
 
 private:
     QString host;

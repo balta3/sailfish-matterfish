@@ -64,10 +64,13 @@ Page {
 
         model: MattermostClient.selectedChannel.posts
         delegate: ListItem {
-            height: userLabel.height + Theme.paddingMedium + messageLabel.height < Theme.paddingMedium + userLabel.height + 2 + avatar.height ?
-                        Theme.paddingMedium + userLabel.height + 2 + avatar.height
-                      : userLabel.height + Theme.paddingMedium + messageLabel.height
+            id: postItem
+            height: userLabel.height + Theme.paddingMedium + messageLabel.height + attachementsContainer.height < Theme.paddingMedium + avatar.height ?
+                        Theme.paddingMedium + avatar.height
+                      : userLabel.height + Theme.paddingMedium + messageLabel.height + attachementsContainer.height
             contentHeight: height
+
+            property var files: model.files
 
             Label {
                 id: userLabel
@@ -113,6 +116,55 @@ Page {
                 anchors.topMargin: timeLabel.height + Theme.paddingSmall
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
+            }
+
+            Item {
+                id: attachementsContainer
+                anchors.left: messageLabel.left
+                anchors.top: messageLabel.bottom
+                height: attachementsList.height + Theme.paddingMedium
+                width: parent.width
+
+                ListView {
+                    id: attachementsList
+                    model: postItem.files
+                    height: contentHeight
+                    width: parent.width
+                    anchors.top: parent.top
+                    anchors.topMargin: Theme.paddingMedium
+                    delegate: ListItem {
+                        height: thumbnail.visible ? fileIcon.height + thumbnail.height + Theme.paddingSmall : fileIcon.height
+                        width: parent.width
+                        contentHeight: height
+                        Component.onCompleted: if (model.name.length === 0) MattermostClient.initFile(model.id);
+
+                        Image {
+                            id: fileIcon
+                            height: Theme.iconSizeSmall
+                            fillMode: Image.PreserveAspectFit
+                            source: model.mimeType.match("^image/") ? "image://theme/icon-m-image" : "image://theme/icon-s-attach"
+                        }
+                        Label {
+                            anchors.left: fileIcon.right
+                            anchors.leftMargin: Theme.paddingSmall
+                            anchors.bottom: fileIcon.bottom
+                            text: model.name.length === 0 ? model.id : model.name
+                            font.pixelSize: Theme.fontSizeTiny
+                        }
+                        Image {
+                            id: thumbnail
+                            anchors.top: fileIcon.bottom
+                            anchors.topMargin: Theme.paddingSmall
+                            anchors.left: fileIcon.right
+                            anchors.leftMargin: Theme.paddingSmall
+                            width: parent.width
+                            fillMode: Image.PreserveAspectFit
+                            horizontalAlignment: Image.AlignLeft
+                            source: "image://filethumbnail/" + model.id
+                            visible: model.hasPreviewImage
+                        }
+                    }
+                }
             }
         }
 

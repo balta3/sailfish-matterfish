@@ -155,6 +155,18 @@ void MattermostChannel::updatePosts(QJsonDocument& doc, QMap<QString, Mattermost
     }
 }
 
+MattermostFile *MattermostChannel::findFileById(QString fileId)
+{
+    foreach (MattermostPost* post, this->posts) {
+        foreach (MattermostFile* file, post->getFiles()) {
+            if (file->getId() == fileId) {
+                return file;
+            }
+        }
+    }
+    return 0;
+}
+
 void MattermostChannel::memberLastViewedChanged(const QDateTime &value)
 {
     emit this->unreadChanged(this->isUnread());
@@ -169,5 +181,14 @@ void MattermostChannel::addPost(QJsonObject &postJson, QMap<QString, MattermostU
     post->setCreated(created);
     MattermostUser* user = users[postJson["user_id"].toString()];
     post->setUser(user);
+    if (!postJson["file_ids"].isUndefined()) {
+        QJsonArray fileArray = postJson["file_ids"].toArray();
+        foreach (const QJsonValue &fileJson, fileArray) {
+            QString fileId = fileJson.toString();
+            MattermostFile* file = new MattermostFile(this);
+            file->setId(fileId);
+            post->addFile(file);
+        }
+    }
     this->addPost(post);
 }

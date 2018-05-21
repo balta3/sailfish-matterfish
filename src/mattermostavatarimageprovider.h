@@ -40,4 +40,14 @@ private:
     MattermostClient* client;
 };
 
+class MattermostFileImageProvider : public QQuickAsyncImageProvider
+{
+public:
+    MattermostFileImageProvider(MattermostClient* mattermostClient);
+    QQuickImageResponse* requestImageResponse(const QString &id, const QSize &requestedSize);
+
+private:
+    MattermostClient* client;
+};
+
 #endif // MATTERMOSTAVATARIMAGEPROVIDER_H

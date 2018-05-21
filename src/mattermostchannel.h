@@ -59,6 +59,7 @@ public:
     void clearPosts();
     QQmlListProperty<MattermostPost> getPostsQML();
     void updatePosts(QJsonDocument& doc, QMap<QString, MattermostUser*> users);
+    MattermostFile* findFileById(QString fileId);
 
 signals:
     void idChanged(const QString &value);
