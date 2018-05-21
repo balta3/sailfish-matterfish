@@ -15,7 +15,8 @@ static QObject* clientGen(QQmlEngine *engine, QJSEngine *scriptEngine) {
 
     engine->addImageProvider("avatar", new MattermostAvatarImageProvider(client));
     engine->addImageProvider("team", new MattermostTeamIconImageProvider(client));
-    engine->addImageProvider("filethumbnail", new MattermostFileImageProvider(client));
+    engine->addImageProvider("filethumbnail", new MattermostFileThumbnailImageProvider(client));
+    engine->addImageProvider("file", new MattermostFileImageProvider(client));
     return client;
 }
 

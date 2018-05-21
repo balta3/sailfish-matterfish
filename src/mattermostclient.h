@@ -27,6 +27,7 @@ class MattermostClient : public QObject {
     Q_PROPERTY(quint16 messageCount READ getMessageCount WRITE setMessageCount NOTIFY messageCountChanged)
     Q_PROPERTY(quint16 mentionCount READ getMentionCount WRITE setMentionCount NOTIFY mentionCountChanged)
     Q_PROPERTY(QString state READ getState WRITE setState NOTIFY stateChanged)
+    Q_PROPERTY(MattermostFile* selectedFile READ getSelectedFile WRITE setSelectedFile NOTIFY selectedFileChanged)
 public:
     explicit MattermostClient(QObject *parent = nullptr);
 
@@ -64,6 +65,9 @@ public:
     QString getState() const;
     void setState(const QString &value);
 
+    MattermostFile *getSelectedFile() const;
+    void setSelectedFile(MattermostFile *value);
+
 signals:
     void hostChanged(const QString& host);
     void usernameChanged(const QString& username);
@@ -76,6 +80,7 @@ signals:
     void messageCountChanged(quint16 &value);
     void mentionCountChanged(quint16 &value);
     void stateChanged(QString &value);
+    void selectedFileChanged(const MattermostFile* file);
 
 public slots:
     void connectToHost();
@@ -102,6 +107,7 @@ private:
 
     MattermostTeam* selectedTeam;
     MattermostChannel* selectedChannel;
+    MattermostFile* selectedFile;
     QString newMessage;
     quint16 messageCount;
     quint16 mentionCount;

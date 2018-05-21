@@ -62,6 +62,19 @@ MattermostFileImageProvider::MattermostFileImageProvider(MattermostClient *matte
 QQuickImageResponse *MattermostFileImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
 {
     QUrl fileThumbnailURL = this->client->getBaseURL();
+    fileThumbnailURL.setPath("/api/v4/files/" + id);
+    MattermostAsyncImageResponse* resp = new MattermostAsyncImageResponse(fileThumbnailURL, this->client->getAuthorization());
+    return resp;
+}
+
+MattermostFileThumbnailImageProvider::MattermostFileThumbnailImageProvider(MattermostClient *mattermostClient) : QQuickAsyncImageProvider()
+{
+    this->client = mattermostClient;
+}
+
+QQuickImageResponse *MattermostFileThumbnailImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
+{
+    QUrl fileThumbnailURL = this->client->getBaseURL();
     fileThumbnailURL.setPath("/api/v4/files/" + id + "/thumbnail");
     MattermostAsyncImageResponse* resp = new MattermostAsyncImageResponse(fileThumbnailURL, this->client->getAuthorization());
     return resp;

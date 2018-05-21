@@ -170,6 +170,17 @@ void MattermostClient::initFile(QString fileId)
     this->netAccessManager->get(request);
 }
 
+MattermostFile *MattermostClient::getSelectedFile() const
+{
+    return selectedFile;
+}
+
+void MattermostClient::setSelectedFile(MattermostFile *value)
+{
+    this->selectedFile = value;
+    emit this->selectedFileChanged(this->selectedFile);
+}
+
 QString MattermostClient::getState() const
 {
     return this->state;

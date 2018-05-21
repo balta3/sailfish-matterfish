@@ -137,6 +137,12 @@ Page {
                         width: parent.width
                         contentHeight: height
                         Component.onCompleted: if (model.name.length === 0) MattermostClient.initFile(model.id);
+                        onClicked: {
+                            if (model.mimeType.match("^image/")) {
+                                MattermostClient.selectedFile = model.modelData
+                                pageStack.push(Qt.resolvedUrl("ImagePage.qml"))
+                            }
+                        }
 
                         Image {
                             id: fileIcon

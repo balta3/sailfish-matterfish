@@ -44,7 +44,8 @@ DISTFILES += qml/harbour-matterfish.qml \
     qml/pages/LoginPage.qml \
     qml/pages/TeamsPage.qml \
     qml/pages/ChannelsPage.qml \
-    qml/pages/PostsPage.qml
+    qml/pages/PostsPage.qml \
+    qml/pages/ImagePage.qml
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
