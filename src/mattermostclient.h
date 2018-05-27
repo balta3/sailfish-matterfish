@@ -20,7 +20,6 @@ class MattermostClient : public QObject {
     Q_PROPERTY(QString username READ getUsername WRITE setUsername NOTIFY usernameChanged)
     Q_PROPERTY(QString password READ getPassword WRITE setPassword NOTIFY passwordChanged)
     Q_PROPERTY(MattermostTeam* selectedTeam READ getSelectedTeam WRITE setSelectedTeam NOTIFY selectedTeamChanged)
-    Q_PROPERTY(MattermostChannel* selectedChannel READ getSelectedChannel WRITE setSelectedChannel NOTIFY selectedChannelChanged)
     Q_PROPERTY(QString newMessage READ getNewMessage WRITE setNewMessage NOTIFY newMessageChanged)
     Q_PROPERTY(QQmlListProperty<MattermostTeam> teams READ getTeamsQML NOTIFY teamsChanged)
     Q_PROPERTY(QUrl baseURL READ getBaseURL WRITE setBaseURL NOTIFY baseURLChanged)
@@ -44,9 +43,6 @@ public:
     void setSelectedTeam(MattermostTeam *value);
 
     QQmlListProperty<MattermostTeam> getTeamsQML();
-
-    MattermostChannel *getSelectedChannel() const;
-    void setSelectedChannel(MattermostChannel *value);
 
     QUrl getBaseURL() const;
     void setBaseURL(const QUrl &value);
@@ -73,7 +69,6 @@ signals:
     void usernameChanged(const QString& username);
     void passwordChanged(const QString& password);
     void selectedTeamChanged(const MattermostTeam* team);
-    void selectedChannelChanged(const MattermostChannel* channel);
     void teamsChanged();
     void baseURLChanged(const QUrl& value);
     void newMessageChanged(const QString& newMessage);
@@ -94,7 +89,7 @@ public slots:
     void onWebSocketConnected();
     void onWebSocketMessage(QString message);
     void onWebSocketError(QAbstractSocket::SocketError error);
-    void sendNewMessage();
+    void sendNewMessage(MattermostChannel* channel);
     void initFile(QString fileId);
 
 private:
@@ -106,8 +101,8 @@ private:
     QMap<QString, MattermostUser*> users;
 
     MattermostTeam* selectedTeam;
-    MattermostChannel* selectedChannel;
     MattermostFile* selectedFile;
+    QList<QString> loadingFileMetaIds;
     QString newMessage;
     quint16 messageCount;
     quint16 mentionCount;

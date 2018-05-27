@@ -54,8 +54,8 @@ public:
     QList<MattermostPost *> getPosts() const;
     void setPosts(const QList<MattermostPost *> &value);
 
-    void addPost(MattermostPost* post);
-    void addPost(QJsonObject& postJson, QMap<QString, MattermostUser*> users);
+    void addPost(MattermostPost* post, bool emitSignal = true);
+    void addPost(QJsonObject& postJson, QMap<QString, MattermostUser*> users, bool emitSignal = true);
     void clearPosts();
     QQmlListProperty<MattermostPost> getPostsQML();
     void updatePosts(QJsonDocument& doc, QMap<QString, MattermostUser*> users);

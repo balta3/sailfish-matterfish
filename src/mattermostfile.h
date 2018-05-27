@@ -6,15 +6,14 @@
 class MattermostFile : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString id READ getId WRITE setId)
+    Q_PROPERTY(QString id READ getId CONSTANT)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString mimeType READ getMimeType WRITE setMimeType NOTIFY mimeTypeChanged)
     Q_PROPERTY(bool hasPreviewImage READ getHasPreviewImage WRITE setHasPreviewImage NOTIFY hasPreviewImageChanged)
 public:
-    explicit MattermostFile(QObject *parent = nullptr);
+    explicit MattermostFile(QString id, QObject *parent = nullptr);
 
     QString getId() const;
-    void setId(const QString &value);
 
     QString getName() const;
     void setName(const QString &value);

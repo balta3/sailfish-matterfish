@@ -1,23 +1,18 @@
 #include "mattermostfile.h"
 
-MattermostFile::MattermostFile(QObject *parent) : QObject(parent)
+MattermostFile::MattermostFile(QString id, QObject *parent) : QObject(parent)
 {
-
+    this->id = id;
 }
 
 QString MattermostFile::getId() const
 {
-    return id;
-}
-
-void MattermostFile::setId(const QString &value)
-{
-    id = value;
+    return this->id;
 }
 
 QString MattermostFile::getName() const
 {
-    return name;
+    return this->name;
 }
 
 void MattermostFile::setName(const QString &value)
@@ -28,17 +23,17 @@ void MattermostFile::setName(const QString &value)
 
 QString MattermostFile::getExtension() const
 {
-    return extension;
+    return this->extension;
 }
 
 void MattermostFile::setExtension(const QString &value)
 {
-    extension = value;
+    this->extension = value;
 }
 
 QString MattermostFile::getMimeType() const
 {
-    return mimeType;
+    return this->mimeType;
 }
 
 void MattermostFile::setMimeType(const QString &value)
@@ -49,17 +44,17 @@ void MattermostFile::setMimeType(const QString &value)
 
 quint64 MattermostFile::getSize() const
 {
-    return size;
+    return this->size;
 }
 
 void MattermostFile::setSize(const quint64 &value)
 {
-    size = value;
+    this->size = value;
 }
 
 bool MattermostFile::getHasPreviewImage() const
 {
-    return hasPreviewImage;
+    return this->hasPreviewImage;
 }
 
 void MattermostFile::setHasPreviewImage(bool value)

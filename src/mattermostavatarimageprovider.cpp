@@ -35,6 +35,7 @@ MattermostAvatarImageProvider::MattermostAvatarImageProvider(MattermostClient* m
 
 QQuickImageResponse *MattermostAvatarImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
 {
+    Q_UNUSED(requestedSize)
     QUrl avatarURL = this->client->getBaseURL();
     avatarURL.setPath("/api/v4/users/" + id + "/image");
     MattermostAsyncImageResponse* resp = new MattermostAsyncImageResponse(avatarURL, this->client->getAuthorization());
@@ -48,6 +49,7 @@ MattermostTeamIconImageProvider::MattermostTeamIconImageProvider(MattermostClien
 
 QQuickImageResponse *MattermostTeamIconImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
 {
+    Q_UNUSED(requestedSize)
     QUrl teamIconURL = this->client->getBaseURL();
     teamIconURL.setPath("/api/v4/teams/" + id + "/image");
     MattermostAsyncImageResponse* resp = new MattermostAsyncImageResponse(teamIconURL, this->client->getAuthorization());
@@ -61,6 +63,7 @@ MattermostFileImageProvider::MattermostFileImageProvider(MattermostClient *matte
 
 QQuickImageResponse *MattermostFileImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
 {
+    Q_UNUSED(requestedSize)
     QUrl fileThumbnailURL = this->client->getBaseURL();
     fileThumbnailURL.setPath("/api/v4/files/" + id);
     MattermostAsyncImageResponse* resp = new MattermostAsyncImageResponse(fileThumbnailURL, this->client->getAuthorization());
@@ -74,6 +77,7 @@ MattermostFileThumbnailImageProvider::MattermostFileThumbnailImageProvider(Matte
 
 QQuickImageResponse *MattermostFileThumbnailImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
 {
+    Q_UNUSED(requestedSize)
     QUrl fileThumbnailURL = this->client->getBaseURL();
     fileThumbnailURL.setPath("/api/v4/files/" + id + "/thumbnail");
     MattermostAsyncImageResponse* resp = new MattermostAsyncImageResponse(fileThumbnailURL, this->client->getAuthorization());

@@ -8,9 +8,16 @@ Page {
 
     allowedOrientations: Orientation.All
 
+    property var selectedChannel;
+
+    Component.onCompleted: {
+        MattermostClient.refreshChannelPosts(selectedChannel);
+        console.log("after")
+    }
+
     PageHeader {
         id: pageHeader
-        title: MattermostClient.selectedChannel.displayName
+        title: selectedChannel.displayName
 
         PullDownMenu {
             MenuItem {
@@ -50,7 +57,7 @@ Page {
                                                              : Theme.highlightColor)
                 onClicked: {
                     MattermostClient.newMessage = newMessageTextField.text;
-                    MattermostClient.sendNewMessage();
+                    MattermostClient.sendNewMessage(selectedChannel);
                 }
             }
         }
@@ -62,7 +69,7 @@ Page {
             }
         }
 
-        model: MattermostClient.selectedChannel.posts
+        model: selectedChannel.posts
         delegate: ListItem {
             id: postItem
             height: userLabel.height + Theme.paddingMedium + messageLabel.height + attachementsContainer.height < Theme.paddingMedium + avatar.height ?
@@ -71,6 +78,20 @@ Page {
             contentHeight: height
 
             property var files: model.files
+
+            property bool isInViewport: listView.contentY < postItem.y + postItem.height
+                                        && listView.contentY + listView.height > postItem.y
+
+            onIsInViewportChanged: {
+                if (isInViewport) {
+                    for (var i = 0; i < model.files.length; i++) {
+                        var postFile = model.files[i];
+                        if (postFile.name.length === 0) {
+                            MattermostClient.initFile(postFile.id);
+                        }
+                    }
+                }
+            }
 
             Label {
                 id: userLabel
@@ -136,7 +157,6 @@ Page {
                         height: thumbnail.visible ? fileIcon.height + thumbnail.height + Theme.paddingSmall : fileIcon.height
                         width: parent.width
                         contentHeight: height
-                        Component.onCompleted: if (model.name.length === 0) MattermostClient.initFile(model.id);
                         onClicked: {
                             if (model.mimeType.match("^image/")) {
                                 MattermostClient.selectedFile = model.modelData
@@ -177,7 +197,7 @@ Page {
         PushUpMenu {
             MenuItem {
                 text: qsTr("Reload")
-                onClicked: MattermostClient.refreshChannelPosts(MattermostClient.selectedChannel)
+                onClicked: MattermostClient.refreshChannelPosts(selectedChannel)
             }
         }
     }

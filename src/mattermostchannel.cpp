@@ -104,7 +104,7 @@ void MattermostChannel::setPosts(const QList<MattermostPost *> &value)
     posts = value;
 }
 
-void MattermostChannel::addPost(MattermostPost *post)
+void MattermostChannel::addPost(MattermostPost *post, bool emitSignal)
 {
     if (this->posts.isEmpty()) {
         this->posts << post;
@@ -116,7 +116,9 @@ void MattermostChannel::addPost(MattermostPost *post)
         }
         this->posts.insert(p, post);
     }
-    emit this->postsChanged();
+    if (emitSignal) {
+        emit this->postsChanged();
+    }
     if (this->lastPostAt < post->getCreated()) {
         this->setLastPostAt(post->getCreated());
     }
@@ -151,8 +153,9 @@ void MattermostChannel::updatePosts(QJsonDocument& doc, QMap<QString, Mattermost
     foreach (const QJsonValue &orderJson, orderArray) {
         QString postId = orderJson.toString();
         QJsonObject postJson = posts[postId].toObject();
-        this->addPost(postJson, users);
+        this->addPost(postJson, users, false);
     }
+    emit this->postsChanged();
 }
 
 MattermostFile *MattermostChannel::findFileById(QString fileId)
@@ -169,26 +172,12 @@ MattermostFile *MattermostChannel::findFileById(QString fileId)
 
 void MattermostChannel::memberLastViewedChanged(const QDateTime &value)
 {
+    Q_UNUSED(value)
     emit this->unreadChanged(this->isUnread());
 }
 
-void MattermostChannel::addPost(QJsonObject &postJson, QMap<QString, MattermostUser*> users) {
-    MattermostPost* post = new MattermostPost(this);
-    post->setMessage(postJson["message"].toString());
-    qlonglong createdTimestamp = postJson["create_at"].toVariant().toLongLong();
-    QDateTime created;
-    created.setTime_t(createdTimestamp / 1000);
-    post->setCreated(created);
+void MattermostChannel::addPost(QJsonObject &postJson, QMap<QString, MattermostUser*> users, bool emitSignal) {
     MattermostUser* user = users[postJson["user_id"].toString()];
-    post->setUser(user);
-    if (!postJson["file_ids"].isUndefined()) {
-        QJsonArray fileArray = postJson["file_ids"].toArray();
-        foreach (const QJsonValue &fileJson, fileArray) {
-            QString fileId = fileJson.toString();
-            MattermostFile* file = new MattermostFile(this);
-            file->setId(fileId);
-            post->addFile(file);
-        }
-    }
-    this->addPost(post);
+    MattermostPost* post = new MattermostPost(user, postJson, this);
+    this->addPost(post, emitSignal);
 }

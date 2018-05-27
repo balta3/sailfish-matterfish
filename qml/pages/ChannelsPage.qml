@@ -52,9 +52,9 @@ Page {
             }
 
             onClicked: {
-                console.log(model.modelData)
-                MattermostClient.selectedChannel = model.modelData
-                pageStack.push(Qt.resolvedUrl("PostsPage.qml"))
+                pageStack.push(Qt.resolvedUrl("PostsPage.qml"), {
+                                    "selectedChannel": model.modelData
+                               });
             }
         }
     }

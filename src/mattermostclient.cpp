@@ -136,7 +136,7 @@ void MattermostClient::refreshChannelPosts(MattermostChannel *channel) {
     this->netAccessManager->get(request);
 }
 
-void MattermostClient::sendNewMessage() {
+void MattermostClient::sendNewMessage(MattermostChannel* channel) {
     qDebug() << this->newMessage;
     QUrl postUrl = this->baseURL;
     postUrl.setPath("/api/v4/posts");
@@ -147,7 +147,7 @@ void MattermostClient::sendNewMessage() {
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     QVariantMap msgPost;
-    msgPost["channel_id"] = this->selectedChannel->getId();
+    msgPost["channel_id"] = channel->getId();
     msgPost["message"] = this->newMessage;
     QJsonDocument doc = QJsonDocument::fromVariant(msgPost);
 
@@ -158,7 +158,11 @@ void MattermostClient::sendNewMessage() {
 
 void MattermostClient::initFile(QString fileId)
 {
+    if (this->loadingFileMetaIds.contains(fileId)) {
+        return;
+    }
     qDebug() << "init file" << fileId;
+    this->loadingFileMetaIds << fileId;
     QUrl infoUrl = this->baseURL;
     infoUrl.setPath("/api/v4/files/" + fileId + "/info");
 
@@ -344,8 +348,9 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
             qDebug() << "fileInfo";
             QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
             QJsonObject fileJson = doc.object();
+            QString fileId = fileJson["id"].toString();
             foreach(MattermostTeam* team, this->teams) {
-                MattermostFile *file = team->findFileById(fileJson["id"].toString());
+                MattermostFile *file = team->findFileById(fileId);
                 if (file) {
                     file->setName(fileJson["name"].toString());
                     file->setExtension(fileJson["extension"].toString());
@@ -354,6 +359,7 @@ void MattermostClient::onResponse(QNetworkReply *reply) {
                     file->setHasPreviewImage(fileJson["has_preview_image"].toBool());
                 }
             }
+            this->loadingFileMetaIds.removeOne(fileId);
         } else {
             qDebug() << "unknown reply: " << path;
         }
@@ -418,6 +424,7 @@ void MattermostClient::onWebSocketMessage(QString messageStr) {
 }
 
 void MattermostClient::onWebSocketError(QAbstractSocket::SocketError error) {
+    Q_UNUSED(error)
     qDebug() << "websocket error" << this->webSocket->errorString();
     this->setState("offline");
 }
@@ -446,18 +453,6 @@ void MattermostClient::setBaseURL(const QUrl &value)
 QString MattermostClient::getAuthorization()
 {
     return QString("Bearer " + this->token);
-}
-
-MattermostChannel *MattermostClient::getSelectedChannel() const
-{
-    return selectedChannel;
-}
-
-void MattermostClient::setSelectedChannel(MattermostChannel *value)
-{
-    selectedChannel = value;
-    emit this->selectedChannelChanged(this->selectedChannel);
-    this->refreshChannelPosts(value);
 }
 
 MattermostTeam *MattermostClient::getSelectedTeam() const
