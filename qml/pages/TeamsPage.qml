@@ -88,5 +88,22 @@ Page {
                 pageStack.push(Qt.resolvedUrl("ChannelsPage.qml"))
             }
         }
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Connect")
+                visible: MattermostClient.state == 'offline'
+                onClicked: MattermostClient.connectToHost();
+            }
+            MenuItem {
+                text: qsTr("Disconnect")
+                visible: MattermostClient.state == 'online'
+                onClicked: MattermostClient.disconnectFromHost();
+            }
+            MenuLabel {
+                id: stateLabel
+                text: MattermostClient.state
+            }
+        }
     }
 }

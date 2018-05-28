@@ -79,6 +79,7 @@ signals:
 
 public slots:
     void connectToHost();
+    void disconnectFromHost();
     void refreshTeams();
     void refreshTeamUnreads();
     void refreshChannels(MattermostTeam* team);

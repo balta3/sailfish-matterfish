@@ -57,4 +57,15 @@
         <translation>Element</translation>
     </message>
 </context>
+<context>
+    <name>TeamsPage</name>
+    <message>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

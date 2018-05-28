@@ -69,6 +69,11 @@ void MattermostClient::connectToHost() {
     this->netAccessManager->post(request, payload);
 }
 
+void MattermostClient::disconnectFromHost()
+{
+
+}
+
 void MattermostClient::refreshTeams() {
     QUrl teamsURL = this->baseURL;
     teamsURL.setPath("/api/v4/users/" + this->user["id"].toString() + "/teams");
