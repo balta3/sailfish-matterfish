@@ -88,6 +88,7 @@ public slots:
     void refreshChannelPosts(MattermostChannel* channel);
     void onResponse(QNetworkReply* reply);
     void onWebSocketConnected();
+    void onWebSocketDisconnected();
     void onWebSocketMessage(QString message);
     void onWebSocketError(QAbstractSocket::SocketError error);
     void sendNewMessage(MattermostChannel* channel);

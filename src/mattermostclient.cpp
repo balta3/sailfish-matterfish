@@ -15,6 +15,7 @@ MattermostClient::MattermostClient(QObject *parent) : QObject(parent)
     this->webSocket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
     QObject::connect(this->webSocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onWebSocketMessage(QString)));
     QObject::connect(this->webSocket, SIGNAL(connected()), this, SLOT(onWebSocketConnected()));
+    QObject::connect(this->webSocket, SIGNAL(disconnected()), this, SLOT(onWebSocketDisconnected()));
     QObject::connect(this->webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onWebSocketError(QAbstractSocket::SocketError)));
     this->state = "offline";
 }
@@ -71,7 +72,9 @@ void MattermostClient::connectToHost() {
 
 void MattermostClient::disconnectFromHost()
 {
-
+    if (this->webSocket->isValid()) {
+        this->webSocket->close();
+    }
 }
 
 void MattermostClient::refreshTeams() {
@@ -384,6 +387,10 @@ void MattermostClient::onWebSocketConnected() {
     QJsonDocument websocketAuthJson = QJsonDocument::fromVariant(websocketAuthMap);
     this->webSocket->sendTextMessage(QString(websocketAuthJson.toJson()));
     this->setState("online");
+}
+
+void MattermostClient::onWebSocketDisconnected() {
+    this->setState("offline");
 }
 
 void MattermostClient::onWebSocketMessage(QString messageStr) {
