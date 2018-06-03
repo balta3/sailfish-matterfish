@@ -44,6 +44,8 @@ private:
     QDateTime created;
     MattermostUser* user;
     QList<MattermostFile*> files;
+
+    void processMarkdown();
 };
 
 #endif // MATTERMOSTPOST_H

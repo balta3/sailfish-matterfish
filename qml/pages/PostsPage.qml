@@ -137,6 +137,7 @@ Page {
                 anchors.topMargin: timeLabel.height + Theme.paddingSmall
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
+                onLinkActivated: Qt.openUrlExternally(link)
             }
 
             Item {

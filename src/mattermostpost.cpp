@@ -2,6 +2,7 @@
 
 #include <QLocale>
 #include <QJsonArray>
+#include <QRegularExpression>
 
 MattermostPost::MattermostPost(MattermostUser* user, QJsonObject &postJson, QObject *parent) : QObject(parent)
 {
@@ -17,6 +18,7 @@ MattermostPost::MattermostPost(MattermostUser* user, QJsonObject &postJson, QObj
             this->files << (file);
         }
     }
+    this->processMarkdown();
 }
 
 QString MattermostPost::getMessage() const
@@ -27,6 +29,7 @@ QString MattermostPost::getMessage() const
 void MattermostPost::setMessage(const QString &value)
 {
     this->message = value;
+    this->processMarkdown();
     emit this->messageChanged(this->message);
 }
 
@@ -59,4 +62,14 @@ void MattermostPost::addFile(MattermostFile *file)
 {
     this->files << file;
     emit this->filesChanged();
+}
+
+void MattermostPost::processMarkdown() {
+    this->message.replace(QRegularExpression("(https?:\\/\\/[^\\s]*)"), "<a href=\"\\1\">\\1</a>");
+    this->message.replace(QRegularExpression("(?:[^\\w]|^)__(.+)__(?:[^\\w]|$)"), "<b>\\1</b>");
+    this->message.replace(QRegularExpression("(?:[^\\w]|^)\\*\\*(.+)\\*\\*(?:[^\\w]|$)"), "<b>\\1</b>");
+    this->message.replace(QRegularExpression("(?:[^\\w]|^)_(.+)_(?:[^\\w]|$)"), "<i>\\1</i>");
+    this->message.replace(QRegularExpression("(?:[^\\w]|^)\\*(.+)\\*(?:[^\\w]|$)"), "<i>\\1</i>");
+    this->message.replace(QRegularExpression("(?:[^\\w]|^)`(.+)`(?:[^\\w]|$)"), "<tt>\\1</tt>");
+    this->message.replace(QRegularExpression("```(.+)```"), "<pre>\\1</pre>");
 }
