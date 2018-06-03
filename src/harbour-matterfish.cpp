@@ -8,6 +8,8 @@
 #include "mattermostclient.h"
 #include "mattermostavatarimageprovider.h"
 
+QGuiApplication* app;
+
 static QObject* clientGen(QQmlEngine *engine, QJSEngine *scriptEngine) {
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
@@ -17,6 +19,7 @@ static QObject* clientGen(QQmlEngine *engine, QJSEngine *scriptEngine) {
     engine->addImageProvider("team", new MattermostTeamIconImageProvider(client));
     engine->addImageProvider("filethumbnail", new MattermostFileThumbnailImageProvider(client));
     engine->addImageProvider("file", new MattermostFileImageProvider(client));
+    QObject::connect(app, SIGNAL(applicationStateChanged(Qt::ApplicationState)), client, SLOT(onApplicationStateChange(Qt::ApplicationState)));
     return client;
 }
 
@@ -46,5 +49,9 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<MattermostPost>("harbour.matterfish", 1, 0, "MattermostPost", "");
     qmlRegisterUncreatableType<MattermostUser>("harbour.matterfish", 1, 0, "MattermostUser", "");
     qmlRegisterUncreatableType<MattermostFile>("harbour.matterfish", 1, 0, "MattermostFile", "");
-    return SailfishApp::main(argc, argv);
+    app = SailfishApp::application(argc, argv);
+    QQuickView* view = SailfishApp::createView();
+    view->setSource(SailfishApp::pathTo("qml/harbour-matterfish.qml"));
+    view->showFullScreen();
+    return app->exec();
 }

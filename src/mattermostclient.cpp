@@ -17,7 +17,7 @@ MattermostClient::MattermostClient(QObject *parent) : QObject(parent)
     QObject::connect(this->webSocket, SIGNAL(connected()), this, SLOT(onWebSocketConnected()));
     QObject::connect(this->webSocket, SIGNAL(disconnected()), this, SLOT(onWebSocketDisconnected()));
     QObject::connect(this->webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onWebSocketError(QAbstractSocket::SocketError)));
-    this->state = "offline";
+    this->state = CLIENT_STATE_OFFLINE;
 }
 
 QString MattermostClient::getHost() const
@@ -68,6 +68,7 @@ void MattermostClient::connectToHost() {
     QByteArray payload = QJsonDocument::fromVariant(loginData).toJson();
 
     this->netAccessManager->post(request, payload);
+    this->setState(CLIENT_STATE_CONNECTING);
 }
 
 void MattermostClient::disconnectFromHost()
@@ -180,6 +181,34 @@ void MattermostClient::initFile(QString fileId)
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     this->netAccessManager->get(request);
+}
+
+void MattermostClient::onApplicationStateChange(Qt::ApplicationState state)
+{
+    if (Qt::ApplicationActive == state) {
+        if (!this->token.isEmpty()) {
+            if (this->state == CLIENT_STATE_OFFLINE) {
+                this->connectToHost();
+            }
+        }
+    } else {
+        if (this->state == CLIENT_STATE_ONLINE) {
+            if (!this->onlineInBackground) {
+                this->disconnectFromHost();
+            }
+        }
+    }
+}
+
+bool MattermostClient::getOnlineInBackground() const
+{
+    return this->onlineInBackground;
+}
+
+void MattermostClient::setOnlineInBackground(bool value)
+{
+    this->onlineInBackground = value;
+    emit this->onlineInBackgroundChanged(this->onlineInBackground);
 }
 
 MattermostFile *MattermostClient::getSelectedFile() const
@@ -386,11 +415,11 @@ void MattermostClient::onWebSocketConnected() {
     websocketAuthMap["data"] = websocketAuthMapData;
     QJsonDocument websocketAuthJson = QJsonDocument::fromVariant(websocketAuthMap);
     this->webSocket->sendTextMessage(QString(websocketAuthJson.toJson()));
-    this->setState("online");
+    this->setState(CLIENT_STATE_ONLINE);
 }
 
 void MattermostClient::onWebSocketDisconnected() {
-    this->setState("offline");
+    this->setState(CLIENT_STATE_OFFLINE);
 }
 
 void MattermostClient::onWebSocketMessage(QString messageStr) {
@@ -438,7 +467,9 @@ void MattermostClient::onWebSocketMessage(QString messageStr) {
 void MattermostClient::onWebSocketError(QAbstractSocket::SocketError error) {
     Q_UNUSED(error)
     qDebug() << "websocket error" << this->webSocket->errorString();
-    this->setState("offline");
+    if (this->state == CLIENT_STATE_ONLINE) {
+        this->connectToHost();
+    }
 }
 
 QString MattermostClient::getNewMessage() const

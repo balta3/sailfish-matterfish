@@ -17,6 +17,7 @@ Dialog {
         MattermostClient.username = username.text;
         MatterfishSettings.password = password.text;
         MattermostClient.password = password.text;
+        MattermostClient.onlineInBackground = MatterfishSettings.onlineInBackground;
         MattermostClient.connectToHost();
     }
 

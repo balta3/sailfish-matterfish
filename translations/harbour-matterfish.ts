@@ -58,6 +58,25 @@
     </message>
 </context>
 <context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep online in background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, the connection to the mattermost server will be kept alive and reconnected automatically on connection loss even if the app is in the background. This may increase the battery consumption.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TeamsPage</name>
     <message>
         <source>Connect</source>
@@ -65,6 +84,10 @@
     </message>
     <message>
         <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

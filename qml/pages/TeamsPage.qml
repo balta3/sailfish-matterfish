@@ -91,6 +91,10 @@ Page {
 
         PullDownMenu {
             MenuItem {
+                text: qsTr("Settings")
+                onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"));
+            }
+            MenuItem {
                 text: qsTr("Connect")
                 visible: MattermostClient.state == 'offline'
                 onClicked: MattermostClient.connectToHost();

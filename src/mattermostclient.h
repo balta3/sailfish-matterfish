@@ -14,11 +14,16 @@
 #include "mattermostuser.h"
 #include "mattermostpost.h"
 
+#define CLIENT_STATE_ONLINE "online"
+#define CLIENT_STATE_OFFLINE "offline"
+#define CLIENT_STATE_CONNECTING "connecting"
+
 class MattermostClient : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString host READ getHost WRITE setHost NOTIFY hostChanged)
     Q_PROPERTY(QString username READ getUsername WRITE setUsername NOTIFY usernameChanged)
     Q_PROPERTY(QString password READ getPassword WRITE setPassword NOTIFY passwordChanged)
+    Q_PROPERTY(bool onlineInBackground READ getOnlineInBackground WRITE setOnlineInBackground NOTIFY onlineInBackgroundChanged)
     Q_PROPERTY(MattermostTeam* selectedTeam READ getSelectedTeam WRITE setSelectedTeam NOTIFY selectedTeamChanged)
     Q_PROPERTY(QString newMessage READ getNewMessage WRITE setNewMessage NOTIFY newMessageChanged)
     Q_PROPERTY(QQmlListProperty<MattermostTeam> teams READ getTeamsQML NOTIFY teamsChanged)
@@ -64,6 +69,9 @@ public:
     MattermostFile *getSelectedFile() const;
     void setSelectedFile(MattermostFile *value);
 
+    bool getOnlineInBackground() const;
+    void setOnlineInBackground(bool value);
+
 signals:
     void hostChanged(const QString& host);
     void usernameChanged(const QString& username);
@@ -76,6 +84,7 @@ signals:
     void mentionCountChanged(quint16 &value);
     void stateChanged(QString &value);
     void selectedFileChanged(const MattermostFile* file);
+    void onlineInBackgroundChanged(bool);
 
 public slots:
     void connectToHost();
@@ -93,11 +102,14 @@ public slots:
     void onWebSocketError(QAbstractSocket::SocketError error);
     void sendNewMessage(MattermostChannel* channel);
     void initFile(QString fileId);
+    void onApplicationStateChange(Qt::ApplicationState state);
 
 private:
     QString host;
     QString username;
     QString password;
+    bool onlineInBackground;
+
     QVariantMap user;
     QList<MattermostTeam*> teams;
     QMap<QString, MattermostUser*> users;
